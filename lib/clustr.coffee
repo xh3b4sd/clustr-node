@@ -12,13 +12,15 @@ class exports.Clustr
     @master = Master.create(Optimist.argv)
     @slave  = Slave.create(Optimist.argv)
 
-    @prepare (command, args) =>
-      @spawn(command, args)
-
 
 
   @create: (options) ->
-    new Clustr(options)
+    clustr new Clustr(options)
+
+    clustr.master.do () =>
+      @prepare(@spawn)
+
+    clustr
 
 
 
@@ -59,5 +61,5 @@ class exports.Clustr
 
     # respawn slave
     slave.on "exit", (code) =>
-      console.log("respawn slave", args)
+      console.log("respawning slave with code", code)
       @spawn(command, args)
