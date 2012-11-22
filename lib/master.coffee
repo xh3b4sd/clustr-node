@@ -20,4 +20,4 @@ class exports.Master
 
 
   isMaster: () ->
-    @options.mode is not "slave"
+    @options.mode is undefined or @options.mode is not "slave"

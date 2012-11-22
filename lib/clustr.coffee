@@ -12,15 +12,12 @@ class exports.Clustr
     @master = Master.create(Optimist.argv)
     @slave  = Slave.create(Optimist.argv)
 
+    @master.do () =>
+      @prepare(@spawn)
 
 
   @create: (options) ->
-    clustr new Clustr(options)
-
-    clustr.master.do () =>
-      @prepare(@spawn)
-
-    clustr
+    new Clustr(options)
 
 
 
