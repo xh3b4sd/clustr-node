@@ -1,10 +1,7 @@
-_    = require("underscore")
-Send = require("./send").Send
+_        = require("underscore")
+Send     = require("./send").Send
 
 class exports.Slave
-  ###
-  # Optains contains the process arguments.
-  ###
   constructor: (@options) ->
     @send = Send.create()
 
@@ -31,4 +28,4 @@ class exports.Slave
 
 
   isSlave: () =>
-    @options.mode is "slave"
+    @options.mode? is true and @options.mode is "slave"

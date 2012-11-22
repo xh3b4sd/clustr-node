@@ -5,9 +5,6 @@ Slave    = require("./slave").Slave
 Optimist = require("optimist")
 
 class exports.Clustr
-  ###
-  # options contains the cluster configuration
-  ###
   constructor: (@options) ->
     @master = Master.create(@options.master)
     @slave  = Slave.create(Optimist.argv)
@@ -15,8 +12,8 @@ class exports.Clustr
     @master.do () =>
       @prepareOptions(@spawnSlave)
 
-    @slave.do (slave) =>
-      @setupSlave(slave.options)
+    @slave.do () =>
+      @setupSlave()
 
 
 
@@ -67,14 +64,11 @@ class exports.Clustr
     slave.on "exit", (code) =>
       console.log "respawn slave: code: #{code} command: #{command} #{args.join(" ")}"
 
-      @spawnSlave(command, args)
+      #@spawnSlave(command, args)
 
 
 
-  ###
-  # Options contains the process arguments.
-  ###
-  setupSlave: (options) =>
-    if options.deamon is true
+  setupSlave: () =>
+    if Optimist.argv.deamon is true
       anonym = () ->
       setInterval(anonym, 60000)
