@@ -20,5 +20,5 @@ class exports.Slave
 
 
 
-  isSlave: ()
+  isSlave: () ->
     @options.mode is "slave"

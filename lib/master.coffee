@@ -19,5 +19,5 @@ class exports.Master
 
 
 
-  isMaster: ()
+  isMaster: () ->
     @options.mode is not "slave"
