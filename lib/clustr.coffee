@@ -50,13 +50,13 @@ class exports.Clustr
   spawn: (command, args) ->
     slave = spawn(command, args)
 
-    slave.stdout.on("data",  (data) {
+    slave.stdout.on "data", (data) =>
       console.log(data)
 
-    slave.stderr.on("data",  (data) {
+    slave.stderr.on "data", (data) =>
       console.log(data)
 
     # respawn slave
-    slave.on("exit", (code) =>
+    slave.on "exit", (code) =>
       console.log("slave", id, "respawn")
       @spawn(command, args)
