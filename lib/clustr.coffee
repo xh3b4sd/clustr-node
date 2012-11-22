@@ -1,34 +1,38 @@
 ChildProcess = require("child_process")
 _        = require("underscore")
-Optimist = require("optimist")
 Master   = require("./master").Master
 Slave    = require("./slave").Slave
+Optimist = require("optimist")
 
 class exports.Clustr
   ###
-  # Options contains the cluster configuration.
+  # options contains the cluster configuration
   ###
   constructor: (@options) ->
-    @master = Master.create(Optimist.argv)
+    @master = Master.create(@options.master)
     @slave  = Slave.create(Optimist.argv)
 
     @master.do () =>
-      @prepare(@spawn)
+      @prepareOptions(@spawnSlave)
+
+    @slave.do (slave) =>
+      @setupSlave(slave.options)
 
 
-  @create: (options) ->
+
+  @create: (options) =>
     new Clustr(options)
 
 
 
   ###
-  # Possible commands
+  # some possible commands
   #   node                app.js --args=foo
   #   coffee              app.js --args=foo
   #   taskset -c 1 node   app.js --args=foo
   #   taskset -c 1 coffee app.js --args=foo
   ###
-  prepare: (cb) ->
+  prepareOptions: (cb) =>
     _.each @options.slaves, (slave) =>
       [ command, filename ] = process.argv
       args = []
@@ -41,13 +45,16 @@ class exports.Clustr
       args.push("--mode=slave")
 
       _.each slave, (option, name) =>
-        args.push("--#{name}=#{option}")
+        if option is true
+          args.push("--#{name}")
+        else
+          args.push("--#{name}=#{option}")
 
       cb(command, args)
 
 
 
-  spawn: (command, args) ->
+  spawnSlave: (command, args) =>
     slave = ChildProcess.spawn(command, args)
 
     slave.stdout.on "data", (data) =>
@@ -58,5 +65,16 @@ class exports.Clustr
 
     # respawn slave
     slave.on "exit", (code) =>
-      console.log("respawning slave with code", code)
-      @spawn(command, args)
+      console.log "respawn slave: code: #{code} command: #{command} #{args.join(" ")}"
+
+      @spawnSlave(command, args)
+
+
+
+  ###
+  # Options contains the process arguments.
+  ###
+  setupSlave: (options) =>
+    if options.deamon is true
+      anonym = () ->
+      setInterval(anonym, 60000)

@@ -1,3 +1,4 @@
+_    = require("underscore")
 Send = require("./send").Send
 
 class exports.Slave
@@ -9,16 +10,25 @@ class exports.Slave
 
 
 
-  @create: (options) ->
+  @create: (options) =>
     new Slave(options)
 
 
 
-  do: (name, cb) ->
-    return cb(@) if @isSlave() and @options.name is name
-    cb(@) if @isSlave()
+  do: () =>
+    return if not @isSlave()
+
+    args = _.toArray(arguments)
+
+    if args.length is 1
+      [cb] = args
+      return cb(@)
+
+    if args.length is 2
+      [name, cb] = args
+      return cb(@) if @options.name is name
 
 
 
-  isSlave: () ->
+  isSlave: () =>
     @options.mode is "slave"

@@ -1,10 +1,13 @@
-Send = require("./send").Send
+_    = require("underscore")
+Send     = require("./send").Send
+Optimist = require("optimist")
 
 class exports.Master
   ###
-  # Options contains the process arguments.
+  # options contains the master configuration
   ###
-  constructor: (@options) ->
+  constructor: (options) ->
+    @options = _.extend({}, options, Optimist.argv)
     @send = Send.create()
 
 
