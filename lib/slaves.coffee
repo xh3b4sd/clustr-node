@@ -1,7 +1,7 @@
 _        = require("underscore")
 Redis    = require("redis")
 
-class exports.Slave
+class exports.Slaves
   constructor: (@options) ->
     @publisher  = Redis.createClient()
     @subscriber = Redis.createClient()
@@ -9,7 +9,7 @@ class exports.Slave
 
 
   @create: (options) =>
-    new Slave(options)
+    new Slaves(options)
 
 
 
@@ -25,20 +25,13 @@ class exports.Slave
 
 
   subscribe: () =>
-    @subscriber.subscribe("public")
-    @subscriber.subscribe(@options.name)
+    @subscriber.subscribe("slaves")
 
 
 
-  onPublic: (cb) =>
+  onMessage: (cb) =>
     @subscriber.on "message", (channel, message) =>
-      cb(message) if channel is "public"
-
-
-
-  onPrivate: (cb) =>
-    @subscriber.on "message", (channel, message) =>
-      cb(message) if channel is @options.name
+      cb(message) if channel is "slaves"
 
 
 

@@ -1,23 +1,11 @@
 class exports.Send
-  constructor: () ->
-    #
+  constructor: (@options) ->
 
 
 
-  @create: () ->
-    new Send()
+  @create: (options) ->
+    new Send(options)
 
 
 
-  master: () ->
-    #
-
-
-
-  slave: () ->
-    #
-
-
-
-  slaves: () ->
-    #
+  prepareMessageHandler: () =>
