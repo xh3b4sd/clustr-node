@@ -8,7 +8,7 @@ responseable for worker spawning and messaging between all processes.
 ## install
 
 ```
-  npm install clustr
+npm install clustr
 ```
 
 ## usage
@@ -18,7 +18,7 @@ responseable for worker spawning and messaging between all processes.
 To require the module, just do.
 
 ```coffeescript
-  Clustr = require("clustr")
+Clustr = require("clustr")
 ```
 
 ### options
@@ -28,15 +28,15 @@ the master spawn 4 workers, you need to define the options as follows. The
 `name` property is required.
 
 ```coffeescript
-  options =
-    master:
-      { name: "master" }
-    worker: [
-      { name: "web" }
-      { name: "web" }
-      { name: "cache" }
-      { name: "cache" }
-    ]
+options =
+  master:
+    { name: "master" }
+  worker: [
+    { name: "web" }
+    { name: "web" }
+    { name: "cache" }
+    { name: "cache" }
+  ]
 ```
 
 Optionally workers can have the following properties.
@@ -47,15 +47,15 @@ Optionally workers can have the following properties.
 So you could define your workers like that.
 
 ```coffeescript
-  options =
-    master:
-      { name: "master" }
-    slaves: [
-      { name: "web", cpu: 1, respawn: true }
-      { name: "web", cpu: 2, respawn: true }
-      { name: "cache" }
-      { name: "cache" }
-    ]
+options =
+  master:
+    { name: "master" }
+  slaves: [
+    { name: "web", cpu: 1, respawn: true }
+    { name: "web", cpu: 2, respawn: true }
+    { name: "cache" }
+    { name: "cache" }
+  ]
 ```
 
 ### creation
@@ -63,7 +63,7 @@ So you could define your workers like that.
 Create a new cluster is pretty simple.
 
 ```coffeescript
-  clustr  = Clustr.create(options)
+clustr  = Clustr.create(options)
 ```
 
 ### master
@@ -71,24 +71,24 @@ Create a new cluster is pretty simple.
 To make only the master do something, do as described below.
 
 ```coffeescript
-  clustr.master.do (master) =>
-    # do something with master
+clustr.master.do (master) =>
+  # do something with master
 ```
 
 Public messages are send to each living process. To make the master listen to
 public messages do.
 
 ```coffeescript
-  master.onPublic (message) =>
-    # do something with public message when it was received
+master.onPublic (message) =>
+  # do something with public message when it was received
 ```
 
 Private messages are for a specific role only. To make the master listen to
 private messages do.
 
 ```coffeescript
-  master.onPrivate (message) =>
-    # do something with private message when it was received
+master.onPrivate (message) =>
+  # do something with private message when it was received
 ```
 
 The master is able to waiting for confirmations. To listen to a confirmation
@@ -96,14 +96,14 @@ just do the following. As described, the callback is executed when the message
 "cache" was received 2 times.
 
 ```coffeescript
-  master.onConfirm 2, "cache", () =>
-    # do something when message "cache" was received 2 times
+master.onConfirm 2, "cache", () =>
+  # do something when message "cache" was received 2 times
 ```
 
 To make the master publish a message do.
 
 ```coffeescript
-  master.publish("channel", "message")
+master.publish("channel", "message")
 ```
 
 ### worker
@@ -112,36 +112,36 @@ Each process has a name. The process name represents a role. To make only
 `cache` workers do something, do as described below.
 
 ```coffeescript
-  clustr.worker.do "cache", (cacheWorker) =>
-    # do something with cacheWorker
+clustr.worker.do "cache", (cacheWorker) =>
+  # do something with cacheWorker
 ```
 
 Public messages are send to each living process. To make a worker listen to
 public messages do.
 
 ```coffeescript
-  cacheWorker.onPublic (message) =>
-    # do something with public message when it was received
+cacheWorker.onPublic (message) =>
+  # do something with public message when it was received
 ```
 
 Private messages are for a specific role only. To make each worker of a role
 listen to private messages do.
 
 ```coffeescript
-  cacheWorker.onPrivate (message) =>
-    # do something with private message when it was received
+cacheWorker.onPrivate (message) =>
+  # do something with private message when it was received
 ```
 
 To make each worker of a role publish a message do.
 
 ```coffeescript
-  cacheWorker.publish("channel", "message")
+cacheWorker.publish("channel", "message")
 ```
 
 To make each worker of a role publish a confirmation message do.
 
 ```coffeescript
-  cacheWorker.publish("confirm", "cache")
+cacheWorker.publish("confirm", "cache")
 ```
 
 ### workers
@@ -149,23 +149,23 @@ To make each worker of a role publish a confirmation message do.
 To make each worker do something, regardless of its role, do as described below.
 
 ```coffeescript
-  clustr.workers.do (workers) =>
-    # do sonething with workers
+clustr.workers.do (workers) =>
+  # do sonething with workers
 ```
 
 To make each worker listen to messages all workers receive, regardless of their
 role, do as described below.
 
 ```coffeescript
-  worker.onMessage (message) =>
-    # do something with message
+worker.onMessage (message) =>
+  # do something with message
 ```
 
 To make each worker publish a message, regardless of their role, do as described
 below.
 
 ```coffeescript
-  slaves.publish("channel", "message")
+slaves.publish("channel", "message")
 ```
 
 ### examples
