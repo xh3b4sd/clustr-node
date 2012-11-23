@@ -106,7 +106,7 @@ class exports.Master
     worker.on "exit", (code) =>
       console.log "respawn worker: code: #{code} command: #{command} #{args.join(" ")}"
 
-      #@spawnWorker(command, args)
+      @spawnWorker(command, args) if code is not 0
 
 
 

@@ -14,7 +14,6 @@ class exports.Workers
 
 
   setup: () =>
-    @deamon()
     @subscribe()
 
 
@@ -37,13 +36,6 @@ class exports.Workers
 
   isWorker: () =>
     @options.mode? is true and @options.mode is "worker"
-
-
-
-  deamon: () =>
-    if @options.deamon is true
-      anonym = () ->
-      setInterval(anonym, 60000)
 
 
 

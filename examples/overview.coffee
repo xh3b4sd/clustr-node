@@ -1,20 +1,16 @@
 Clustr  = require("../index")
 
 options =
-  defaults:
-    test: false
-    ppid: process.pid
-  cluster:
-    master:
-      { name: "master", port: 8000 }
-    workers: [
-      { name: "web", port: 8001, cpu: 1, respawn: true, deamon: true }
-      { name: "web", port: 8002, cpu: 2, respawn: true, deamon: true }
-      { name: "cache", deamon: true }
-      { name: "cache", deamon: true }
-    ]
+  master:
+    { name: "master" }
+  workers: [
+    { name: "web", cpu: 1, respawn: true }
+    { name: "web", cpu: 2, respawn: true }
+    { name: "cache" }
+    { name: "cache" }
+  ]
 
-clustr  = Clustr.create(options.cluster)
+clustr  = Clustr.create(options)
 
 
 
