@@ -1,7 +1,7 @@
 _        = require("underscore")
 Redis    = require("redis")
 
-class exports.Slaves
+class exports.Workers
   constructor: (@options) ->
     @publisher  = Redis.createClient()
     @subscriber = Redis.createClient()
@@ -9,7 +9,7 @@ class exports.Slaves
 
 
   @create: (options) =>
-    new Slaves(options)
+    new Workers(options)
 
 
 
@@ -25,18 +25,18 @@ class exports.Slaves
 
 
   subscribe: () =>
-    @subscriber.subscribe("slaves")
+    @subscriber.subscribe("workers")
 
 
 
   onMessage: (cb) =>
     @subscriber.on "message", (channel, message) =>
-      cb(message) if channel is "slaves"
+      cb(message) if channel is "workers"
 
 
 
-  isSlave: () =>
-    @options.mode? is true and @options.mode is "slave"
+  isWorker: () =>
+    @options.mode? is true and @options.mode is "worker"
 
 
 
@@ -48,7 +48,7 @@ class exports.Slaves
 
 
   do: () =>
-    return if not @isSlave()
+    return if not @isWorker()
 
     args = _.toArray(arguments)
 

@@ -1,23 +1,23 @@
 _        = require("underscore")
 Master   = require("./master").Master
-Slave    = require("./slave").Slave
-Slaves   = require("./slaves").Slaves
+Worker    = require("./worker").Worker
+Workers   = require("./workers").Workers
 Optimist = require("optimist")
 
 class exports.Clustr
   constructor: (@options) ->
     @master = Master.create(@options)
-    @slave  = Slave.create(Optimist.argv)
-    @slaves = Slaves.create(Optimist.argv)
+    @worker  = Worker.create(Optimist.argv)
+    @workers = Workers.create(Optimist.argv)
 
     @master.do () =>
       @master.setup()
 
-    @slave.do () =>
-      @slave.setup()
+    @worker.do () =>
+      @worker.setup()
 
-    @slaves.do () =>
-      @slaves.setup()
+    @workers.do () =>
+      @workers.setup()
 
 
 

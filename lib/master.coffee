@@ -7,7 +7,7 @@ class exports.Master
   constructor: (options) ->
     @publisher  = Redis.createClient()
     @subscriber = Redis.createClient()
-    @slaves     = options.slaves
+    @workers    = options.workers
     @options    = options.master
 
 
@@ -19,7 +19,7 @@ class exports.Master
 
   setup: () =>
     @subscribe()
-    @prepareOptions(@spawnSlave)
+    @prepareOptions(@spawnWorker)
 
 
 
@@ -60,7 +60,7 @@ class exports.Master
 
 
   isMaster: () =>
-    Optimist.argv.mode? is false or Optimist.argv.mode is not "slave"
+    Optimist.argv.mode? is false or Optimist.argv.mode is not "worker"
 
 
 
@@ -72,18 +72,18 @@ class exports.Master
   #   taskset -c 1 coffee app.js --args=foo
   ###
   prepareOptions: (cb) =>
-    _.each @slaves, (slave) =>
+    _.each @workers, (worker) =>
       [ command, filename ] = process.argv
       args = []
 
-      if _.has(slave, "cpu")
-        args = [ "-c", slave.cpu, command ]
+      if _.has(worker, "cpu")
+        args = [ "-c", worker.cpu, command ]
         command = "taskset"
 
       args.push(filename)
-      args.push("--mode=slave")
+      args.push("--mode=worker")
 
-      _.each slave, (option, name) =>
+      _.each worker, (option, name) =>
         if option is true
           args.push("--#{name}")
         else
@@ -93,20 +93,20 @@ class exports.Master
 
 
 
-  spawnSlave: (command, args) =>
-    slave = ChildProcess.spawn(command, args)
+  spawnWorker: (command, args) =>
+    worker = ChildProcess.spawn(command, args)
 
-    slave.stdout.on "data", (data) =>
+    worker.stdout.on "data", (data) =>
       console.log(data.toString())
 
-    slave.stderr.on "data", (data) =>
+    worker.stderr.on "data", (data) =>
       console.log(data.toString())
 
-    # respawn slave
-    slave.on "exit", (code) =>
-      console.log "respawn slave: code: #{code} command: #{command} #{args.join(" ")}"
+    # respawn worker
+    worker.on "exit", (code) =>
+      console.log "respawn worker: code: #{code} command: #{command} #{args.join(" ")}"
 
-      #@spawnSlave(command, args)
+      #@spawnWorker(command, args)
 
 
 
