@@ -30,6 +30,7 @@ class exports.Master
 
   subscribe: () =>
     @subscriber.subscribe("public")
+    @subscriber.subscribe("confirm")
     @subscriber.subscribe(@options.name)
 
 
@@ -43,6 +44,18 @@ class exports.Master
   onPrivate: (cb) =>
     @subscriber.on "message", (channel, message) =>
       cb(message) if channel is @options.name
+
+
+
+  onConfirm: (requiredMessages, identifier, cb) =>
+    received = 0
+    @subscriber.on "message", (channel, message) =>
+      return if channel is not "confirm"
+      return if message is not identifier
+      return if ++received < requiredMessages
+
+      received = 0
+      cb(message)
 
 
 
