@@ -24,6 +24,7 @@ Before creating a new cluster, we have to define some options for it. To make
 the master spawn 4 workers, you need to define the options as follows. The
 `name` property is required.
 
+```coffeescript
     options =
       master:
         { name: "master" }
@@ -33,6 +34,7 @@ the master spawn 4 workers, you need to define the options as follows. The
         { name: "cache" }
         { name: "cache" }
       ]
+```
 
 Optionally workers can have the following properties.
 
@@ -41,6 +43,7 @@ Optionally workers can have the following properties.
 
 So you could define your workers like that.
 
+```javascript
     options =
       master:
         { name: "master" }
@@ -50,6 +53,7 @@ So you could define your workers like that.
         { name: "cache" }
         { name: "cache" }
       ]
+```
 
 ### creation
 
