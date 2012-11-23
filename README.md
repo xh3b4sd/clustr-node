@@ -1,5 +1,7 @@
 # clustr
 
+_That project is new and currently under development._
+
 CoffeeScript cluster module to manage multi process cluster in NodeJs. Clustr is
 responseable for worker spawning and messaging between all processes.
 
@@ -130,3 +132,11 @@ To make each worker publish a message, regardless of their role, do as described
 below.
 
     slaves.publish("channel", "message")
+
+### examples
+
+For examples take a look into the `examples/` directory and play around.
+
+### tests
+
+comming soon :)
