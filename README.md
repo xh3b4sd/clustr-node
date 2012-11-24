@@ -33,7 +33,7 @@ the master spawn 4 workers, you need to define the options as follows. The
 options =
   master:
     { name: "master" }
-  worker: [
+  workers: [
     { name: "web" }
     { name: "web" }
     { name: "cache" }
@@ -52,7 +52,7 @@ So you could define your workers like that.
 options =
   master:
     { name: "master" }
-  slaves: [
+  workers: [
     { name: "web", cpu: 1, respawn: true }
     { name: "web", cpu: 2, respawn: true }
     { name: "cache" }
@@ -159,7 +159,7 @@ To make each worker listen to messages all workers receive, regardless of their
 role, do as described below.
 
 ```coffeescript
-worker.onMessage (message) =>
+workers.onMessage (message) =>
   # do something with message
 ```
 
@@ -167,7 +167,7 @@ To make each worker publish a message, regardless of their role, do as described
 below.
 
 ```coffeescript
-slaves.publish("channel", "message")
+workers.publish("channel", "message")
 ```
 
 ### examples
