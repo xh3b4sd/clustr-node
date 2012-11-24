@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/zyndiecate/clustr.png)](https://travis-ci.org/zyndiecate/clustr)
+[![Build Status](https://travis-ci.org/zyndiecate/clustr-node.png)](https://travis-ci.org/zyndiecate/clustr-node)
 
-# clustr
+# clustr-node
 
 ### That project is new and currently under development.
 
@@ -10,7 +10,7 @@ responseable for worker spawning and messaging between all processes.
 ## install
 
 ```
-npm install clustr
+npm install clustr-node
 ```
 
 ## usage
@@ -20,7 +20,7 @@ npm install clustr
 To require the module, just do.
 
 ```coffeescript
-Clustr = require("clustr")
+Clustr = require("clustr-node")
 ```
 
 ### options
