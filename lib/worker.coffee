@@ -1,15 +1,19 @@
 _        = require("underscore")
 Redis    = require("redis")
+Optimist = require("optimist")
 
 class exports.Worker
-  constructor: (@options) ->
-    @publisher  = Redis.createClient()
-    @subscriber = Redis.createClient()
+  constructor: (config) ->
+    return if not @isWorker()
+
+    @config     = Optimist.argv
+    @publisher  = config.workers[@config.id].publisher or Redis.createClient()
+    @subscriber = config.workers[@config.id].subscriber or Redis.createClient()
 
 
 
-  @create: (options) =>
-    new Worker(options)
+  @create: (config) =>
+    new Worker(config)
 
 
 
@@ -25,7 +29,7 @@ class exports.Worker
 
   subscribe: () =>
     @subscriber.subscribe("public")
-    @subscriber.subscribe(@options.name)
+    @subscriber.subscribe(@config.name)
 
 
 
@@ -37,12 +41,12 @@ class exports.Worker
 
   onPrivate: (cb) =>
     @subscriber.on "message", (channel, message) =>
-      cb(message) if channel is @options.name
+      cb(message) if channel is @config.name
 
 
 
   isWorker: () =>
-    @options.mode? is true and @options.mode is "worker"
+    Optimist.argv.mode? is true and Optimist.argv.mode is "worker"
 
 
 
@@ -57,4 +61,4 @@ class exports.Worker
 
     if args.length is 2
       [name, cb] = args
-      return cb(@) if @options.name is name
+      return cb(@) if @config.name is name

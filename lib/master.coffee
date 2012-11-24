@@ -4,22 +4,25 @@ Redis    = require("redis")
 Optimist = require("optimist")
 
 class exports.Master
-  constructor: (options) ->
-    @publisher  = Redis.createClient()
-    @subscriber = Redis.createClient()
-    @workers    = options.workers
-    @options    = options.master
+  constructor: (config) ->
+    return if not @isMaster()
+
+    @config       = config.master
+    @workers      = config.workers
+    @childProcess = @config.childProcess or ChildProcess
+    @publisher    = @config.publisher or Redis.createClient()
+    @subscriber   = @config.subscriber or Redis.createClient()
 
 
 
-  @create: (options) =>
-    new Master(options)
+  @create: (config) =>
+    new Master(config)
 
 
 
   setup: () =>
     @subscribe()
-    @prepareOptions(@spawnWorker)
+    @prepareConfig(@spawnWorker)
 
 
 
@@ -31,7 +34,7 @@ class exports.Master
   subscribe: () =>
     @subscriber.subscribe("public")
     @subscriber.subscribe("confirm")
-    @subscriber.subscribe(@options.name)
+    @subscriber.subscribe(@config.name)
 
 
 
@@ -43,7 +46,7 @@ class exports.Master
 
   onPrivate: (cb) =>
     @subscriber.on "message", (channel, message) =>
-      cb(message) if channel is @options.name
+      cb(message) if channel is @config.name
 
 
 
@@ -71,8 +74,8 @@ class exports.Master
   #   taskset -c 1 node   app.js --args=foo
   #   taskset -c 1 coffee app.js --args=foo
   ###
-  prepareOptions: (cb) =>
-    _.each @workers, (worker) =>
+  prepareConfig: (cb) =>
+    _.each @workers, (worker, id) =>
       [ command, filename ] = process.argv
       args = []
 
@@ -82,19 +85,19 @@ class exports.Master
 
       args.push(filename)
       args.push("--mode=worker")
+      args.push("--id=#{id}")
 
       _.each worker, (option, name) =>
-        if option is true
-          args.push("--#{name}")
-        else
-          args.push("--#{name}=#{option}")
+        return if option is false
+        return args.push("--#{name}") if option is true
+        args.push("--#{name}=#{option}")
 
       cb(command, args)
 
 
 
   spawnWorker: (command, args) =>
-    worker = ChildProcess.spawn(command, args)
+    worker = @childProcess.spawn(command, args)
 
     worker.stdout.on "data", (data) =>
       console.log(data.toString())
@@ -104,9 +107,10 @@ class exports.Master
 
     # respawn worker
     worker.on "exit", (code) =>
-      console.log "respawn worker: code: #{code} command: #{command} #{args.join(" ")}"
+      return if code is 0 or "--respawn" not in args
 
-      @spawnWorker(command, args) if code is not 0
+      console.log "respawn worker: code: #{code} command: #{command} #{args.join(" ")}"
+      @spawnWorker(command, args)
 
 
 

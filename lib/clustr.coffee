@@ -5,10 +5,10 @@ Workers   = require("./workers").Workers
 Optimist = require("optimist")
 
 class exports.Clustr
-  constructor: (@options) ->
-    @master = Master.create(@options)
-    @worker  = Worker.create(Optimist.argv)
-    @workers = Workers.create(Optimist.argv)
+  constructor: (@config) ->
+    @master  = Master.create(@config)
+    @worker  = Worker.create(@config)
+    @workers = Workers.create(@config)
 
     @master.do () =>
       @master.setup()
@@ -21,5 +21,5 @@ class exports.Clustr
 
 
 
-  @create: (options) =>
-    new Clustr(options)
+  @create: (config) =>
+    new Clustr(config)
