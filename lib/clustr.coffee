@@ -2,7 +2,6 @@ _        = require("underscore")
 Master   = require("./master").Master
 Worker    = require("./worker").Worker
 Workers   = require("./workers").Workers
-Optimist = require("optimist")
 
 class exports.Clustr
   constructor: (@config) ->

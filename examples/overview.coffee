@@ -1,6 +1,6 @@
 Clustr  = require("../index")
 
-options =
+config =
   master:
     { name: "master" }
   workers: [
@@ -10,7 +10,7 @@ options =
     { name: "cache" }
   ]
 
-clustr  = Clustr.create(options)
+clustr  = Clustr.create(config)
 
 
 

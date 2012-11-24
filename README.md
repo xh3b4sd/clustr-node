@@ -23,14 +23,14 @@ To require the module, just do.
 Clustr = require("clustr-node")
 ```
 
-### options
+### config
 
-Before creating a new cluster, we have to define some options for it. To make
-the master spawn 4 workers, you need to define the options as follows. The
+Before creating a new cluster, we have to define a config for it. To make
+the master spawn 4 workers, you need to define the config as follows. The
 `name` property is required.
 
 ```coffeescript
-options =
+config =
   master:
     { name: "master" }
   workers: [
@@ -49,7 +49,7 @@ Optionally workers can have the following properties.
 So you could define your workers like that.
 
 ```coffeescript
-options =
+config =
   master:
     { name: "master" }
   workers: [
@@ -65,7 +65,7 @@ options =
 Create a new cluster is pretty simple.
 
 ```coffeescript
-clustr  = Clustr.create(options)
+clustr  = Clustr.create(config)
 ```
 
 ### master
