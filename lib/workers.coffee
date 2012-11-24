@@ -22,24 +22,9 @@ class exports.Workers
 
 
 
-  publish: (channel, message) =>
-    @publisher.publish(channel, message)
-
-
-
-  subscribe: () =>
-    @subscriber.subscribe("workers")
-
-
-
-  onMessage: (cb) =>
-    @subscriber.on "message", (channel, message) =>
-      cb(message) if channel is "workers"
-
-
-
   isWorker: () =>
-    Optimist.argv.mode? is true and Optimist.argv.mode is "worker"
+    @config ?= Optimist.argv
+    @config.mode? is true and @config.mode is "worker"
 
 
 
@@ -55,3 +40,23 @@ class exports.Workers
     if args.length is 2
       [name, cb] = args
       return cb(@) if @config.name is name
+
+
+
+  publish: (channel, message) =>
+    @publisher.publish(channel, message)
+
+
+
+  # workers specific
+
+
+
+  subscribe: () =>
+    @subscriber.subscribe("workers")
+
+
+
+  onMessage: (cb) =>
+    @subscriber.on "message", (channel, message) =>
+      cb(message) if channel is "workers"

@@ -3,7 +3,7 @@ Clustr  = require("../index")
 Mock    = require("./lib/mock")
 
 describe "spawning", () =>
-  [ config, clustr,  callOne, callTwo, callThree, callFour, callFive ] = []
+  [ clustr,  callOne, callTwo, callThree, callFour, callFive ] = []
 
 
 
@@ -22,23 +22,23 @@ describe "spawning", () =>
     [ callOne, callTwo, callThree, callFour, callFive, callSix ] = clustr.master.childProcess.spawn.argsForCall
 
 
-
-  it "should spawn first worker correctly", () =>
-    expect(callOne).toEqual [
-      "taskset"
-      [
-        "-c"
-        0
-        "node"
-        process.argv[1]
-        "--mode=worker"
-        "--id=0"
-        "--name=web"
-        "--cpu=0"
-        "--publisher=[object Object]"
-        "--subscriber=[object Object]"
+  describe "cpu binding", () =>
+    it "should spawn first worker correctly", () =>
+      expect(callOne).toEqual [
+        "taskset"
+        [
+          "-c"
+          0
+          "node"
+          process.argv[1]
+          "--mode=worker"
+          "--id=0"
+          "--name=web"
+          "--cpu=0"
+          "--publisher=[object Object]"
+          "--subscriber=[object Object]"
+        ]
       ]
-    ]
 
 
 

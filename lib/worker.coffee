@@ -22,8 +22,33 @@ class exports.Worker
 
 
 
+  isWorker: () =>
+    @config ?= Optimist.argv
+    @config.mode? is true and @config.mode is "worker"
+
+
+
+  do: () =>
+    return if not @isWorker()
+
+    args = _.toArray(arguments)
+
+    if args.length is 1
+      [cb] = args
+      return cb(@)
+
+    if args.length is 2
+      [name, cb] = args
+      return cb(@) if @config.name is name
+
+
+
   publish: (channel, message) =>
     @publisher.publish(channel, message)
+
+
+
+  # worker specific
 
 
 
@@ -42,23 +67,3 @@ class exports.Worker
   onPrivate: (cb) =>
     @subscriber.on "message", (channel, message) =>
       cb(message) if channel is @config.name
-
-
-
-  isWorker: () =>
-    Optimist.argv.mode? is true and Optimist.argv.mode is "worker"
-
-
-
-  do: () =>
-    return if not @isWorker()
-
-    args = _.toArray(arguments)
-
-    if args.length is 1
-      [cb] = args
-      return cb(@)
-
-    if args.length is 2
-      [name, cb] = args
-      return cb(@) if @config.name is name
