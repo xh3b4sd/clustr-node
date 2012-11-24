@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/zyndiecate/clustr.png)](https://travis-ci.org/zyndiecate/clustr)
+
 # clustr
 
 ### That project is new and currently under development.
@@ -174,4 +176,8 @@ For examples take a look into the `examples/` directory and play around.
 
 ### tests
 
-comming soon :)
+Tests are located in `spec/` directory. To run it just do.
+
+```
+npm test
+```
