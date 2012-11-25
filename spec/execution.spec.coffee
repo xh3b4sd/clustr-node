@@ -3,11 +3,13 @@ Clustr  = require("../index")
 Mock    = require("./lib/mock")
 
 describe "execution", () =>
-  [ clustr ] = []
+  [ cb, config, clustr ] = []
 
 
 
   beforeEach () =>
+    cb = jasmine.createSpy()
+
     config =
       master:
         { name: "master", publisher: Mock.pub(), subscriber: Mock.sub(), childProcess: Mock.chiPro() }
@@ -19,54 +21,110 @@ describe "execution", () =>
       ]
 
     clustr = Clustr.create(config)
-    spyOn(clustr.master,  "publish")
-    spyOn(clustr.worker,  "publish")
-    spyOn(clustr.workers, "publish")
 
 
 
   describe "master", () =>
-    it "should execute only master is allowed to", () =>
-      clustr.master.do (master) =>
-        master.publish("channel", master.config.name)
+    it "should execute callback only master is allowed to", () =>
+      clustr.master.do(cb)
+      expect(cb).toHaveBeenCalled()
 
-        expect(master.publish).toHaveBeenCalledWith("channel", "master")
+
+
+    it "should provide master object to the callback", () =>
+      clustr.master.do(cb)
+
+      [ [ master ] ] = cb.argsForCall
+      expect(master.config.name).toEqual("master")
 
 
 
   describe "webWorker", () =>
-    it "should execute only webWorker is allowed to", () =>
+    it "should execute callback only webWorker is allowed to", () =>
       clustr.worker.config =
         name: "web"
         mode: "worker"
 
-      clustr.worker.do "web", (webWorker) =>
-        webWorker.publish("channel", webWorker.config.name)
+      clustr.worker.do("web", cb)
+      expect(cb).toHaveBeenCalled()
 
-        expect(webWorker.publish).toHaveBeenCalledWith("channel", "web")
+
+
+    it "should provide webWorker object to the callback", () =>
+      clustr.worker.config =
+        name: "web"
+        mode: "worker"
+
+      clustr.worker.do("web", cb)
+
+      [ [ webWorker ] ] = cb.argsForCall
+      expect(webWorker.config.name).toEqual("web")
 
 
 
   describe "cacheWorker", () =>
-    it "should execute only cacheWorker is allowed to", () =>
+    it "should execute callback only cacheWorker is allowed to", () =>
       clustr.worker.config =
         name: "cache"
         mode: "worker"
 
-      clustr.worker.do "cache", (cacheWorker) =>
-        cacheWorker.publish("channel", cacheWorker.config.name)
+      clustr.worker.do("cache", cb)
+      expect(cb).toHaveBeenCalled()
 
-        expect(cacheWorker.publish).toHaveBeenCalledWith("channel", "cache")
+
+
+    it "should provide cacheWorker object to the callback", () =>
+      clustr.worker.config =
+        name: "cache"
+        mode: "worker"
+
+      clustr.worker.do("cache", cb)
+
+      [ [ cacheWorker ] ] = cb.argsForCall
+      expect(cacheWorker.config.name).toEqual("cache")
 
 
 
   describe "workers", () =>
-    it "should execute only workers are allowed to", () =>
-      clustr.workers.config =
-        name: "cache"
-        mode: "worker"
+    describe "webWorker", () =>
+      it "should execute callback only workers is allowed to", () =>
+        clustr.workers.config =
+          name: "web"
+          mode: "worker"
 
-      clustr.workers.do (workers) =>
-        workers.publish("channel", workers.config.name)
+        clustr.workers.do(cb)
+        expect(cb).toHaveBeenCalled()
 
-        expect(workers.publish).toHaveBeenCalledWith("channel", "cache")
+
+
+      it "should provide worker object to the callback", () =>
+        clustr.workers.config =
+          name: "web"
+          mode: "worker"
+
+        clustr.workers.do(cb)
+
+        [ [ webWorker ] ] = cb.argsForCall
+        expect(webWorker.config.name).toEqual("web")
+
+
+    describe "cacheWorker", () =>
+      it "should execute callback only workers is allowed to", () =>
+        clustr.workers.config =
+          name: "cache"
+          mode: "worker"
+
+        clustr.workers.do(cb)
+        expect(cb).toHaveBeenCalled()
+
+
+
+      it "should provide worker object to the callback", () =>
+        clustr.workers.config =
+          name: "cache"
+          mode: "worker"
+
+        clustr.workers.do(cb)
+
+        [ [ cacheWorker ] ] = cb.argsForCall
+        expect(cacheWorker.config.name).toEqual("cache")
