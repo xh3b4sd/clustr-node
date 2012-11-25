@@ -12,10 +12,10 @@ describe "execution", () =>
       master:
         { name: "master", publisher: Mock.pub(), subscriber: Mock.sub(), childProcess: Mock.chiPro() }
       workers: [
-        { name: "web",   publisher: Mock.pub(), subscriber: Mock.sub() }
-        { name: "web",   publisher: Mock.pub(), subscriber: Mock.sub() }
-        { name: "cache", publisher: Mock.pub(), subscriber: Mock.sub() }
-        { name: "cache", publisher: Mock.pub(), subscriber: Mock.sub() }
+        { name: "web",    publisher: Mock.pub(), subscriber: Mock.sub() }
+        { name: "web",    publisher: Mock.pub(), subscriber: Mock.sub() }
+        { name: "cache",  publisher: Mock.pub(), subscriber: Mock.sub() }
+        { name: "cache",  publisher: Mock.pub(), subscriber: Mock.sub() }
       ]
 
     clustr = Clustr.create(config)
