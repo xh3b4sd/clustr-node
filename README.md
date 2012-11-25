@@ -143,7 +143,7 @@ cacheWorker.publish("channel", "message")
 To make each worker of a role publish a confirmation message do.
 
 ```coffeescript
-cacheWorker.publish("confirmation", "cache")
+cacheWorker.publish("confirmation", "message")
 ```
 
 ### workers
@@ -168,6 +168,12 @@ below.
 
 ```coffeescript
 workers.publish("channel", "message")
+```
+
+To make each worker publish a confirmation message do.
+
+```coffeescript
+workers.publish("confirmation", "message")
 ```
 
 ### examples
