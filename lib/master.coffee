@@ -33,7 +33,7 @@ class exports.Master
 
   subscribe: () =>
     @subscriber.subscribe("public")
-    @subscriber.subscribe("confirm")
+    @subscriber.subscribe("confirmation")
     @subscriber.subscribe(@config.name)
 
 
@@ -50,7 +50,7 @@ class exports.Master
 
 
 
-  onConfirm: (requiredMessages, identifier, cb) =>
+  onConfirmation: (requiredMessages, identifier, cb) =>
     received = 0
     @subscriber.on "message", (channel, message) =>
       return if channel is not "confirm"

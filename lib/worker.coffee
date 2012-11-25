@@ -54,7 +54,7 @@ class exports.Worker
 
   subscribe: () =>
     @subscriber.subscribe("public")
-    @subscriber.subscribe(@config.name)
+    @subscriber.subscribe("#{@config.name}Worker")
 
 
 

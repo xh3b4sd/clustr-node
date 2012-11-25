@@ -98,7 +98,7 @@ just do the following. As described, the callback is executed when the message
 "cache" was received 2 times.
 
 ```coffeescript
-master.onConfirm 2, "cache", () =>
+master.onConfirmation 2, "cache", () =>
   # do something when message "cache" was received 2 times
 ```
 
@@ -143,7 +143,7 @@ cacheWorker.publish("channel", "message")
 To make each worker of a role publish a confirmation message do.
 
 ```coffeescript
-cacheWorker.publish("confirm", "cache")
+cacheWorker.publish("confirmation", "cache")
 ```
 
 ### workers

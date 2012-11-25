@@ -31,7 +31,7 @@ describe "confirmation", () =>
       cb = jasmine.createSpy()
 
     it "should not execute callback on subscription", () =>
-      clustr.master.onConfirm requiredMessages, identifier, cb
+      clustr.master.onConfirmation(requiredMessages, identifier, cb)
       [ [ channel, subCb ] ] = clustr.master.subscriber.on.argsForCall
 
       expect(cb.callCount).toEqual(0)
@@ -39,7 +39,7 @@ describe "confirmation", () =>
 
 
     it "should not execute callback on the first confirmation", () =>
-      clustr.master.onConfirm requiredMessages, identifier, cb
+      clustr.master.onConfirmation(requiredMessages, identifier, cb)
       [ [ channel, subCb ] ] = clustr.master.subscriber.on.argsForCall
 
       subCb("confirm", identifier)
@@ -48,7 +48,7 @@ describe "confirmation", () =>
 
 
     it "should execute callback if all required confirmations were received", () =>
-      clustr.master.onConfirm requiredMessages, identifier, cb
+      clustr.master.onConfirmation(requiredMessages, identifier, cb)
       [ [ channel, subCb ] ] = clustr.master.subscriber.on.argsForCall
 
       subCb("confirm", identifier)
@@ -58,7 +58,7 @@ describe "confirmation", () =>
 
 
     it "should be able to receive confirmations again and again", () =>
-      clustr.master.onConfirm requiredMessages, identifier, cb
+      clustr.master.onConfirmation(requiredMessages, identifier, cb)
       [ [ channel, subCb ] ] = clustr.master.subscriber.on.argsForCall
 
       subCb("confirm", identifier)
@@ -84,7 +84,7 @@ describe "confirmation", () =>
       cb = jasmine.createSpy()
 
     it "should not execute callback on subscription", () =>
-      clustr.master.onConfirm requiredMessages, identifier, cb
+      clustr.master.onConfirmation(requiredMessages, identifier, cb)
       [ [ channel, subCb ] ] = clustr.master.subscriber.on.argsForCall
 
       expect(cb.callCount).toEqual(0)
@@ -92,7 +92,7 @@ describe "confirmation", () =>
 
 
     it "should not execute callback on the first confirmation", () =>
-      clustr.master.onConfirm requiredMessages, identifier, cb
+      clustr.master.onConfirmation(requiredMessages, identifier, cb)
       [ [ channel, subCb ] ] = clustr.master.subscriber.on.argsForCall
 
       subCb("confirm", identifier)
@@ -101,7 +101,7 @@ describe "confirmation", () =>
 
 
     it "should not execute callback on the second confirmation", () =>
-      clustr.master.onConfirm requiredMessages, identifier, cb
+      clustr.master.onConfirmation(requiredMessages, identifier, cb)
       [ [ channel, subCb ] ] = clustr.master.subscriber.on.argsForCall
 
       subCb("confirm", identifier)
@@ -111,7 +111,7 @@ describe "confirmation", () =>
 
 
     it "should execute callback if all required confirmations were received", () =>
-      clustr.master.onConfirm requiredMessages, identifier, cb
+      clustr.master.onConfirmation(requiredMessages, identifier, cb)
       [ [ channel, subCb ] ] = clustr.master.subscriber.on.argsForCall
 
       subCb("confirm", identifier)
@@ -122,7 +122,7 @@ describe "confirmation", () =>
 
 
     it "should be able to receive confirmations again and again", () =>
-      clustr.master.onConfirm requiredMessages, identifier, cb
+      clustr.master.onConfirmation(requiredMessages, identifier, cb)
       [ [ channel, subCb ] ] = clustr.master.subscriber.on.argsForCall
 
       subCb("confirm", identifier)
