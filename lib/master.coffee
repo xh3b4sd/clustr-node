@@ -17,7 +17,7 @@ class exports.Master extends Process
   onPrivate: (cb) =>
     @subscriber.on "message", (channel, payload) =>
       return if channel isnt @config.group
-      cb(@prepareIncommingPayload(payload))
+      cb(JSON.parse(payload))
 
 
 
@@ -30,8 +30,3 @@ class exports.Master extends Process
 
       received = 0
       cb(message)
-
-
-
-  isMaster: () =>
-    not @config.workerId?

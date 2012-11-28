@@ -16,6 +16,9 @@ cacheWorker = Clustr.Worker.create
 # cacheWorker receives a public message
 cacheWorker.onPublic (message) =>
 
+# cacheWorker receives a group message
+cacheWorker.onGroup (message) =>
+
 # cacheWorker receives a private message
 cacheWorker.onPrivate (message) =>
 

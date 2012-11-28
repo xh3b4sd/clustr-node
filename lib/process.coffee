@@ -27,7 +27,7 @@ class exports.Process
   onPublic: (cb) =>
     @subscriber.on "message", (channel, payload) =>
       return if channel isnt "public"
-      cb(@prepareIncommingPayload(payload))
+      cb(JSON.parse(payload))
 
 
 
@@ -87,16 +87,7 @@ class exports.Process
     meta:
       workerId: @workerId
       group:    @config.group
-      dataType: typeof message
     data:       message
-
-
-
-  prepareIncommingPayload: (payload) =>
-    if payload.meta.dataType is "object"
-      payload.data = JSON.parse(payload.data)
-
-    payload
 
 
 

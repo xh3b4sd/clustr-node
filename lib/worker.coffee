@@ -19,16 +19,11 @@ class exports.Worker extends Process
   onPrivate: (cb) =>
     @subscriber.on "message", (channel, payload) =>
       return if channel isnt @workerId
-      cb(@prepareIncommingPayload(payload))
+      cb(JSON.parse(payload))
 
 
 
   onGroup: (cb) =>
     @subscriber.on "message", (channel, payload) =>
       return if channel isnt @config.group
-      cb(@prepareIncommingPayload(payload))
-
-
-
-  isWorker: () =>
-    @config.workerId?
+      cb(JSON.parse(payload))

@@ -16,6 +16,9 @@ webWorker = Clustr.Worker.create
 # webWorker receives a public message
 webWorker.onPublic (message) =>
 
+# webWorker receives a group message
+webWorker.onGroup (message) =>
+
 # webWorker receives a private message
 webWorker.onPrivate (message) =>
 
