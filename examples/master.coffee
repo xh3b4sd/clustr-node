@@ -28,8 +28,9 @@ master.publish("channel", "message")
 
 # master spawns worker
 master.spawn [
-  { file: "./web_worker.coffee",   cpu: 1 }
-  { file: "./web_worker.coffee",   cpu: 1 }
-  { file: "./cache_worker.coffee", cpu: 2 }
-  { file: "./cache_worker.coffee", cpu: 2 }
+  { file: "./web_worker.coffee",   cpu: 1          }
+  { file: "./web_worker.coffee",   cpu: 1          }
+  { file: "./cache_worker.coffee", cpu: 2          }
+  { file: "./cache_worker.coffee", cpu: 2          }
+  { file: "./bashscript",          command: "bash" }
 ]

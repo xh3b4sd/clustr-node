@@ -53,11 +53,17 @@ class exports.Process
       [ command, filename ] = process.argv
       args = []
 
+      # change worker command
+      command = worker.command if worker.command?
+
       if _.has(worker, "cpu")
         args = [ "-c", worker.cpu, command ]
         command = "taskset"
 
+      # check worker file
+      return @missingWorkerFileError() if not worker.file?
       args.push(Path.resolve(filename, "../", worker.file))
+
       cb(command, args)
 
 
@@ -78,3 +84,8 @@ class exports.Process
 
       # console.log "respawn worker: code: #{code} command: #{command} #{args.join(" ")}"
       @spawnChildProcess(command, args)
+
+
+
+  missingWorkerFileError: () =>
+    throw new Error("worker file is missing")

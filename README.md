@@ -40,25 +40,8 @@ master = Clustr.Master.create
 
 
 
-Public messages are send to each living process. To make the master listen to
-public messages do.
-```coffeescript
-master.onPublic (message) =>
-  # do something with public message when it was received
-```
-
-
-
-Private messages are for a specific role only that is defined by its name. To
-make the master listen to private messages do.
-```coffeescript
-master.onPrivate (message) =>
-  # do something with private message when it was received
-```
-
-
-
-The master is able to receive for confirmations. To listen to a confirmation
+The master is a normal process like all other workers. The only special thing
+is that the master is able to receive confirmations. To listen to a confirmation
 just do the following. As described, the callback is executed when the message
 "identifier" was received 2 times.
 ```coffeescript
@@ -66,27 +49,7 @@ master.onConfirmation 2, "identifier", () =>
   # do something when message "identifier" was received 2 times
 ```
 
-
-
-To make the master publish a message to a channel do.
-```coffeescript
-master.publish("channel", "message")
-```
-
-
-
-Each process is able to spawn workers. Spawning a worker requires a file the
-worker should execute. Optionally workers can be cpu bound. Cpu affinity is set
-using the `taskset` command, which only works under unix systems. To make the
-master spawn workers, do something like that.
-```coffeescript
-master.spawn [
-  { file: "./web_worker.coffee",   cpu: 1 }
-  { file: "./web_worker.coffee",          }
-  { file: "./cache_worker.coffee", cpu: 2 }
-  { file: "./cache_worker.coffee",        }
-]
-```
+For more information see the next section `worker`.
 
 
 
@@ -101,7 +64,7 @@ worker = Clustr.Worker.create
 
 
 Public messages are send to each living process. To make a worker listen to
-public messages do.
+messages from the `public` channel do.
 ```coffeescript
 worker.onPublic (message) =>
   # do something with public message when it was received
@@ -109,8 +72,8 @@ worker.onPublic (message) =>
 
 
 
-Private messages are for a specific role only that is defined by its name. To
-make a worker listen to private messages do.
+Private messages are for a specific role only that is defined by its `name`
+property. To make a worker listen to private messages do.
 ```coffeescript
 worker.onPrivate (message) =>
   # do something with private message when it was received
@@ -125,16 +88,31 @@ worker.publish("channel", "message")
 
 
 
-Each process is able to spawn workers. Spawning a worker requires a file the
-worker should execute. Optionally workers can be cpu bound. Cpu affinity is set
-using the `taskset` command, which only works under unix systems. To make a
-worker spawn workers, do something like that.
+To make a worker publish a confirmation message do.
+```coffeescript
+worker.publish("confirmation", "message")
+```
+
+
+
+Each process is able to spawn workers, both, the `master` and `workers`.
+
+- Spawning a worker __requires__ a `file` the worker should execute.
+- __Optionally__ workers can be cpu bound. To do so, set `cpu` to one of your
+cores (0, 1, 2, 3, etc.). Cpu affinity is set using the `taskset` command,
+which only works under unix systems.
+- __Optionally__ a process can be executed using a special `command`. Otherwise
+the new process will be executed using the parents execution command.
+
+To make a worker spawn workers, do
+something like that.
 ```coffeescript
 worker.spawn [
-  { file: "./web_worker_child.coffee",   cpu: 1 }
-  { file: "./web_worker_child.coffee",          }
-  { file: "./cache_worker_child.coffee", cpu: 2 }
-  { file: "./cache_worker_child.coffee",        }
+  { file: "./web_worker.coffee",   cpu: 1          }
+  { file: "./web_worker.coffee",   cpu: 1          }
+  { file: "./cache_worker.coffee", cpu: 2          }
+  { file: "./cache_worker.coffee", cpu: 2          }
+  { file: "./bashscript",          command: "bash" }
 ]
 ```
 

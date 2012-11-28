@@ -19,10 +19,10 @@ describe "spawning", () =>
         childProcess: Mock.chiPro()
 
       master.spawn [
-        { file: "./web_worker.coffee" }
-        { file: "./web_worker.coffee",   cpu: 1 }
-        { file: "./cache_worker.coffee" }
-        { file: "./cache_worker.coffee", cpu: 2 }
+        { file: "./web_worker.js" }
+        { file: "./web_worker.js",       cpu: 1 }
+        { file: "./cache_worker.coffee",         command: "coffee" }
+        { file: "./cache_worker.coffee", cpu: 2, command: "coffee" }
       ]
 
       [ callOne, callTwo, callThree, callFour, callFive, callSix ] = master.childProcess.spawn.argsForCall
@@ -33,7 +33,7 @@ describe "spawning", () =>
       expect(callOne).toEqual [
         "node"
         [
-          Path.resolve(process.argv[1], "../", "./web_worker.coffee")
+          Path.resolve(process.argv[1], "../", "./web_worker.js")
         ]
       ]
 
@@ -46,7 +46,7 @@ describe "spawning", () =>
           "-c"
           1
           "node"
-          Path.resolve(process.argv[1], "../", "./web_worker.coffee")
+          Path.resolve(process.argv[1], "../", "./web_worker.js")
         ]
       ]
 
@@ -54,7 +54,7 @@ describe "spawning", () =>
 
     it "should spawn third worker correctly", () =>
       expect(callThree).toEqual [
-        "node"
+        "coffee"
         [
           Path.resolve(process.argv[1], "../", "./cache_worker.coffee")
         ]
@@ -68,7 +68,7 @@ describe "spawning", () =>
         [
           "-c"
           2
-          "node"
+          "coffee"
           Path.resolve(process.argv[1], "../", "./cache_worker.coffee")
         ]
       ]
