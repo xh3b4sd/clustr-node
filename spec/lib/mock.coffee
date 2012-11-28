@@ -1,4 +1,9 @@
 module.exports =
+  uuid: () =>
+    v4: jasmine.createSpy().andReturn("mocked-uuid")
+
+
+
   pub: () =>
     publish: jasmine.createSpy()
 

@@ -35,7 +35,6 @@ Clustr = require("clustr-node")
 Create the master process.
 ```coffeescript
 master = Clustr.Master.create
-  name: "master"
 ```
 
 
@@ -58,7 +57,7 @@ For more information see the next section `worker`.
 Create a worker process.
 ```coffeescript
 worker = Clustr.Worker.create
-  name: "worker"
+  group: "worker"
 ```
 
 
@@ -72,8 +71,18 @@ worker.onPublic (message) =>
 
 
 
-Private messages are for a specific role only that is defined by its `name`
-property. To make a worker listen to private messages do.
+Group messages are for a specific group only that is defined by its `group`
+property. To make a worker listen to group messages do. Note that the master
+is not able to receive group messages.
+```coffeescript
+worker.onGroup (message) =>
+  # do something with group message when it was received
+```
+
+
+
+Private messages are for a specific worker only that is identified by its
+`workerId` property. To make a worker listen to private messages do.
 ```coffeescript
 worker.onPrivate (message) =>
   # do something with private message when it was received
@@ -115,6 +124,25 @@ worker.spawn [
   { file: "./bashscript",          command: "bash" }
 ]
 ```
+
+
+
+### messages
+
+If a process receives a message it looks something like that.
+```coffeescript
+message =
+  meta:
+    workerId: WORKER_ID
+    group:    GROUP
+    dataType: DATA_TYPE
+  data:       YOUR_MESSAGE
+```
+
+Each meta item should be a string. The data you send to a channel, using the
+`publish` method, can be whatever is stringifyable. So you will be able to
+receive what you send. Note that confirmation messages should only be simple
+strings.
 
 
 

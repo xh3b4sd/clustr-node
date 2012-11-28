@@ -9,7 +9,6 @@ describe "messaging", () =>
 
     beforeEach () =>
       master = Clustr.Master.create
-        name: "master"
         publisher: Mock.pub()
         subscriber: Mock.sub()
         childProcess: Mock.chiPro()
@@ -47,19 +46,92 @@ describe "messaging", () =>
     describe "publication", () =>
       [ channel, message ] = []
 
-      beforeEach () =>
-        master.publish("channel", "message")
-        [ [ channel, message ] ] = master.publisher.publish.argsForCall
+      describe "strings", () =>
+        beforeEach () =>
+          master.publish("channel", "message")
+          [ [ channel, message ] ] = master.publisher.publish.argsForCall
 
 
 
-      it "should publish correct channel", () =>
-        expect(channel).toEqual("channel")
+        it "should publish correct channel", () =>
+          expect(channel).toEqual("channel")
 
 
 
-      it "should publish correct message", () =>
-        expect(message).toEqual("message")
+        it "should publish correct message", () =>
+          expect(message).toEqual JSON.stringify
+            meta:
+              group:    "master"
+              dataType: "string"
+            data:       "message"
+
+
+
+      describe "number", () =>
+        beforeEach () =>
+          master.publish("channel", 5)
+
+          [ [ channel, message ] ] = master.publisher.publish.argsForCall
+
+
+
+        it "should publish correct channel", () =>
+          expect(channel).toEqual("channel")
+
+
+
+        it "should publish correct message", () =>
+          expect(message).toEqual JSON.stringify
+            meta:
+              group:    "master"
+              dataType: "number"
+            data:       5
+
+
+
+      describe "object", () =>
+        beforeEach () =>
+          master.publish "channel"
+            message: "object"
+
+          [ [ channel, message ] ] = master.publisher.publish.argsForCall
+
+
+
+        it "should publish correct channel", () =>
+          expect(channel).toEqual("channel")
+
+
+
+        it "should publish correct message", () =>
+          expect(message).toEqual JSON.stringify
+            meta:
+              group:    "master"
+              dataType: "object"
+            data:
+              message:  "object"
+
+
+
+      describe "array", () =>
+        beforeEach () =>
+          master.publish("channel", [ "message", "object" ])
+
+          [ [ channel, message ] ] = master.publisher.publish.argsForCall
+
+
+
+        it "should publish correct channel", () =>
+          expect(channel).toEqual("channel")
+
+
+
+        it "should publish correct message", () =>
+          expect(message).toEqual JSON.stringify
+            meta:
+              group:    "master"
+              dataType: "object"
+            data:       [ "message", "object" ]
 
 
 
@@ -81,14 +153,28 @@ describe "messaging", () =>
 
 
         it "should receive 1 messages", () =>
-          subCb("public", "message")
+          subCb "public"
+            meta:
+              group:    "master"
+              dataType: "string"
+            data:       "message"
+
           expect(cb.callCount).toEqual(1)
 
 
 
         it "should receive correct messages", () =>
-          subCb("public", "message")
-          expect(cb).toHaveBeenCalledWith("message")
+          subCb "public"
+            meta:
+              group:    "master"
+              dataType: "string"
+            data:       "message"
+
+          expect(cb).toHaveBeenCalledWith
+            meta:
+              group:    "master"
+              dataType: "string"
+            data:       "message"
 
 
 
@@ -116,21 +202,49 @@ describe "messaging", () =>
 
 
         it "should receive 1 messages", () =>
-          subCb("master", "message")
+          subCb "master"
+            meta:
+              group:    "master"
+              dataType: "string"
+            data:       "message"
+
           expect(cb.callCount).toEqual(1)
 
 
 
         it "should receive correct messages", () =>
-          subCb("master", "message")
-          expect(cb).toHaveBeenCalledWith("message")
+          subCb "master"
+            meta:
+              group:    "master"
+              dataType: "string"
+            data:       "message"
+
+          expect(cb).toHaveBeenCalledWith
+            meta:
+              group:    "master"
+              dataType: "string"
+            data:       "message"
 
 
 
         it "should not receive messages on other channels", () =>
-          subCb("public", "message")
-          subCb("all", "message")
-          subCb("confirmation", "message")
+          subCb "confirmation"
+            meta:
+              group:    "master"
+              dataType: "string"
+            data:       "message"
+
+          subCb "all"
+            meta:
+              group:    "master"
+              dataType: "string"
+            data:       "message"
+
+          subCb "public"
+            meta:
+              group:    "master"
+              dataType: "string"
+            data:       "message"
 
           expect(cb.callCount).toEqual(0)
 
@@ -141,9 +255,10 @@ describe "messaging", () =>
 
     beforeEach () =>
       worker = Clustr.Worker.create
-        name: "worker"
-        publisher: Mock.pub()
-        subscriber: Mock.sub()
+        group:        "worker"
+        uuid:         Mock.uuid()
+        publisher:    Mock.pub()
+        subscriber:   Mock.sub()
         childProcess: Mock.chiPro()
 
 
@@ -161,13 +276,18 @@ describe "messaging", () =>
 
 
 
-      it "should subscribe to private channel", () =>
+      it "should subscribe to group channel", () =>
         expect(channels).toContain("worker")
 
 
 
-      it "should only subscribe to 2 channels", () =>
-        expect(channels.length).toEqual(2)
+      it "should subscribe to private channel", () =>
+        expect(channels).toContain("mocked-uuid")
+
+
+
+      it "should only subscribe to 3 channels", () =>
+        expect(channels.length).toEqual(3)
 
 
 
@@ -186,7 +306,12 @@ describe "messaging", () =>
 
 
       it "should publish correct message", () =>
-        expect(message).toEqual("message")
+        expect(message).toEqual JSON.stringify
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
 
 
 
@@ -208,21 +333,55 @@ describe "messaging", () =>
 
 
         it "should receive 1 messages", () =>
-          subCb("public", "message")
+          subCb "public"
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
+
           expect(cb.callCount).toEqual(1)
 
 
 
         it "should receive correct messages", () =>
-          subCb("public", "message")
-          expect(cb).toHaveBeenCalledWith("message")
+          subCb "public"
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
+
+          expect(cb).toHaveBeenCalledWith
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
 
 
 
         it "should not receive messages on other channels", () =>
-          subCb("private", "message")
-          subCb("all", "message")
-          subCb("confirmation", "message")
+          subCb "private"
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
+
+          subCb "all"
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
+
+          subCb "confirmation"
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
 
           expect(cb.callCount).toEqual(0)
 
@@ -243,20 +402,123 @@ describe "messaging", () =>
 
 
         it "should receive 1 messages", () =>
-          subCb("worker", "message")
+          subCb "mocked-uuid"
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
+
           expect(cb.callCount).toEqual(1)
 
 
 
         it "should receive correct messages", () =>
-          subCb("worker", "message")
-          expect(cb).toHaveBeenCalledWith("message")
+          subCb "mocked-uuid"
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
+
+          expect(cb).toHaveBeenCalledWith
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
 
 
 
         it "should not receive messages on other channels", () =>
-          subCb("public", "message")
-          subCb("all", "message")
-          subCb("confirmation", "message")
+          subCb "public"
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
+
+          subCb "confirmation"
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
+
+          subCb "all"
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
+
+          expect(cb.callCount).toEqual(0)
+
+
+
+      describe "group channel", () =>
+        beforeEach () =>
+          cb = jasmine.createSpy()
+
+          worker.onGroup(cb)
+          [ [ channel, subCb ] ] = worker.subscriber.on.argsForCall
+
+
+
+        it "should not execute callback on subscription", () =>
+          expect(cb.callCount).toEqual(0)
+
+
+
+        it "should receive 1 messages", () =>
+          subCb "worker"
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
+
+          expect(cb.callCount).toEqual(1)
+
+
+
+        it "should receive correct messages", () =>
+          subCb "worker"
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
+
+          expect(cb).toHaveBeenCalledWith
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
+
+
+
+        it "should not receive messages on other channels", () =>
+          subCb "public"
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
+
+          subCb "confirmation"
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
+
+          subCb "all"
+            meta:
+              workerId: "mocked-uuid"
+              group:    "worker"
+              dataType: "string"
+            data:       "message"
 
           expect(cb.callCount).toEqual(0)

@@ -14,7 +14,8 @@ class exports.Process
 
 
   publish: (channel, message) =>
-    @publisher.publish(channel, message)
+    payload = @prepareOutgogingPayload(message)
+    @publisher.publish(channel, JSON.stringify(payload))
 
 
 
@@ -24,14 +25,9 @@ class exports.Process
 
 
   onPublic: (cb) =>
-    @subscriber.on "message", (channel, message) =>
-      cb(message) if channel is "public"
-
-
-
-  onPrivate: (cb) =>
-    @subscriber.on "message", (channel, message) =>
-      cb(message) if channel is @config.name
+    @subscriber.on "message", (channel, payload) =>
+      return if channel isnt "public"
+      cb(@prepareIncommingPayload(payload))
 
 
 
@@ -84,6 +80,23 @@ class exports.Process
 
       # console.log "respawn worker: code: #{code} command: #{command} #{args.join(" ")}"
       @spawnChildProcess(command, args)
+
+
+
+  prepareOutgogingPayload: (message) =>
+    meta:
+      workerId: @workerId
+      group:    @config.group
+      dataType: typeof message
+    data:       message
+
+
+
+  prepareIncommingPayload: (payload) =>
+    if payload.meta.dataType is "object"
+      payload.data = JSON.parse(payload.data)
+
+    payload
 
 
 
