@@ -4,11 +4,6 @@
 
 # clustr-node
 
-### That project is new and currently under development.
-
-CoffeeScript cluster module to manage multi process cluster in NodeJs. Clustr is
-responseable for worker spawning and messaging between all processes.
-
 
 
 ## install
