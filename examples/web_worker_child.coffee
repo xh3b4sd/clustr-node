@@ -21,8 +21,5 @@ webWorkerChild.onGroup (message) =>
 # webWorkerChild receives a private message
 webWorkerChild.onPrivate (message) =>
 
-# webWorkerChild publishs a message to channel
-webWorkerChild.publish("channel", "message")
-
 # webWorkerChild confirm to master
-webWorkerChild.publish("confirmation", "webWorkerChild")
+webWorkerChild.emitConfirmation("webWorkerChild")

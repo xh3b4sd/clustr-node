@@ -56,6 +56,7 @@ worker = Clustr.Worker.create
 ```
 
 
+#### onPublic
 
 Public messages are send to each living process. To make a worker listen to
 messages from the `public` channel do.
@@ -65,6 +66,19 @@ worker.onPublic (message) =>
 ```
 
 
+
+#### onPrivate
+
+Private messages are for a specific worker only that is identified by its
+`processId` property. To make a worker listen to private messages do.
+```coffeescript
+worker.onPrivate (message) =>
+  # do something with private message when it was received
+```
+
+
+
+#### onGroup
 
 Group messages are for a specific group only that is defined by its `group`
 property. To make a worker listen to group messages do. Note that the master
@@ -76,28 +90,54 @@ worker.onGroup (message) =>
 
 
 
-Private messages are for a specific worker only that is identified by its
-`workerId` property. To make a worker listen to private messages do.
+#### emitPublic
+
+To make a worker publish a public message do.
 ```coffeescript
-worker.onPrivate (message) =>
-  # do something with private message when it was received
+worker.emitPublic("message")
 ```
 
 
 
-To make a worker publish a message to a channel do.
+#### emitPrivate
+
+To make a worker publish a private message do.
 ```coffeescript
-worker.publish("channel", "message")
+worker.emitPrivate("processId", "message")
 ```
 
 
+
+#### emitGroup
+
+To make a worker publish a group message do.
+```coffeescript
+worker.emitGroup("group", "message")
+```
+
+
+
+#### emitConfirmation
 
 To make a worker publish a confirmation message do.
 ```coffeescript
-worker.publish("confirmation", "message")
+worker.emitConfirmation("message")
 ```
 
 
+
+#### emitKill
+
+Each process is able to kill another. For that action you need to know the
+unique `processId` of the worker you want to kill. Each valid exit code, a
+process respects, can be send (0, 1, etc.). To send an exit code to an worker do.
+```coffeescript
+worker.emitKill("processId", EXIT_CODE)
+```
+
+
+
+#### spawn
 
 Each process is able to spawn workers, both, the `master` and `workers`.
 
@@ -122,27 +162,18 @@ worker.spawn [
 
 
 
-Each process is able to kill another. For that action you need to know the
-unique `workerId` of the worker you want to kill. Each valid exit code, a
-process respects, can be send (0, 1, etc.). To send an exit code to an worker do.
-```coffeescript
-worker.killWorker(WORKER_ID, EXIT_CODE)
-```
-
-
-
 ### messages
 
 If a process receives a message it looks something like that.
 ```coffeescript
 message =
   meta:
-    workerId: WORKER_ID
-    group:    GROUP
-  data:       YOUR_MESSAGE
+    processId: PROCESS_ID
+    group:     GROUP
+  data:        YOUR_MESSAGE
 ```
 
-Each meta item should be a string. The `workerId` should not be provided if
+Each meta item should be a string. The `processId` should not be provided if
 the message was sent by the master. The data you send to a channel, using the
 `publish` method, can be whatever is stringifyable. So you will be able to
 receive what you send. Note that confirmation messages should only be simple

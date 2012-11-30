@@ -3,7 +3,7 @@ Jasmine = require("jasmine-node")
 Mock    = require("./lib/mock")
 Clustr  = require("../index")
 
-describe "worker subscription", () =>
+describe "worker channels", () =>
   [ worker, channels ] = []
 
   beforeEach () =>
@@ -23,13 +23,13 @@ describe "worker subscription", () =>
 
 
 
-  it "should subscribe to group channel", () =>
-    expect(channels).toContain("worker")
-
-
-
   it "should subscribe to private channel", () =>
-    expect(channels).toContain("mocked-uuid")
+    expect(channels).toContain("private:mocked-uuid")
+
+
+
+  it "should subscribe to group channel", () =>
+    expect(channels).toContain("group:worker")
 
 
 

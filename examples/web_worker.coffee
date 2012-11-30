@@ -23,13 +23,13 @@ webWorker.onGroup (message) =>
 webWorker.onPrivate (message) =>
 
 # webWorker publishs a message to master
-webWorker.publish("master", "kill me")
+webWorker.emitGroup("master", "kill me")
 
 # webWorker confirm to master
-webWorker.publish("confirmation", "web")
+webWorker.emitConfirmation("webWorker")
 
 # webWorker sends exit code 1 to an worker
-webWorker.killWorker("workerId", 1)
+webWorker.emitKill("processId", 1)
 
 # webWorker spawns worker
 webWorker.spawn [

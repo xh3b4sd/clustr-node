@@ -1,34 +1,122 @@
 _            = require("underscore")
+Uuid         = require("node-uuid")
 Path         = require("path")
 Redis        = require("redis")
 ChildProcess = require("child_process")
 
 class exports.Process
   setup: () =>
+    @stats =
+      emitPublic:          0
+      emitPrivate:         0
+      emitGroup:           0
+      emitKill:            0
+      onPublic:            0
+      onGroup:             0
+      onPrivate:           0
+      onConfirmation:      0
+      spawnChildProcess:   0
+      respawnChildProcess: 0
+
+    @processId    = @config.uuid?.v4()   or Uuid.v4()
     @childProcess = @config.childProcess or ChildProcess
     @publisher    = @config.publisher    or Redis.createClient()
     @subscriber   = @config.subscriber   or Redis.createClient()
 
-    # subscribe to all channels
+    @channels ?= []
+    @channels.push("public")
+    @channels.push("private:#{@processId}")
+    @channels.push("group:#{@config.group}")
+    @channels.push("kill:#{@processId}")
+
+    @setupSubscriptions()
+    @setupKill()
+
+
+
+  setupSubscriptions: () =>
     @subscriber.subscribe(channel) for channel in @channels
 
 
 
-  killWorker: (workerId, code = 0) =>
-    payload = @prepareOutgogingPayload(code)
-    @publisher.publish("kill:#{workerId}", JSON.stringify(payload))
+  setupKill: () =>
+    @subscriber.on "message", (channel, payload) =>
+      message = JSON.parse(payload)
+      # console.log("#{message.meta.group} kill #{@config.group} - exit code: #{message.data}")
+      process.exit(message.data) if channel is "kill:#{@processId}"
 
 
 
-  publish: (channel, message) =>
+  #
+  # emitter
+  #
+
+
+
+  emitPublic: (message) =>
     payload = @prepareOutgogingPayload(message)
-    @publisher.publish(channel, JSON.stringify(payload))
+    @publisher.publish("public", JSON.stringify(payload))
+    @stats.emitPublic++
+
+
+
+  emitPrivate: (processId, message) =>
+    payload = @prepareOutgogingPayload(message)
+    @publisher.publish("private:#{processId}", JSON.stringify(payload))
+    @stats.emitPrivate++
+
+
+
+  emitGroup: (group, message) =>
+    payload = @prepareOutgogingPayload(message)
+    @publisher.publish("group:#{group}", JSON.stringify(payload))
+    @stats.emitGroup++
+
+
+
+  emitKill: (processId, code = 0) =>
+    payload = @prepareOutgogingPayload(code)
+    @publisher.publish("kill:#{processId}", JSON.stringify(payload))
+    @stats.emitKill++
+
+
+
+  #
+  # listener
+  #
 
 
 
   onPublic: (cb) =>
     @subscriber.on "message", (channel, payload) =>
-      cb(JSON.parse(payload)) if channel is "public"
+      return if channel isnt "public"
+
+      cb(JSON.parse(payload))
+      @stats.onPublic++
+
+
+
+  onPrivate: (cb) =>
+    @subscriber.on "message", (channel, payload) =>
+      return if channel isnt "private:#{@processId}"
+
+      cb(JSON.parse(payload))
+      @stats.onPrivate++
+
+
+
+  onGroup: (cb) =>
+    @subscriber.on "message", (channel, payload) =>
+      return if channel isnt "group:#{@config.group}"
+
+      cb(JSON.parse(payload))
+      @stats.onGroup++
+
+
+
+  #
+  # spawning
+  #
 
 
 
@@ -67,6 +155,7 @@ class exports.Process
 
   spawnChildProcess: (command, args) =>
     worker = @childProcess.spawn(command, args)
+    @stats.spawnChildProcess++
     # console.log "spawned worker: command: #{command} #{args.join(" ")}"
 
     worker.stdout.on "data", (data) =>
@@ -79,16 +168,23 @@ class exports.Process
     worker.on "exit", (code) =>
       return if code is 0
 
-      # console.log "respawn worker: code: #{code} command: #{command} #{args.join(" ")}"
       @spawnChildProcess(command, args)
+      @stats.respawnChildProcess++
+      # console.log "respawn worker: code: #{code} command: #{command} #{args.join(" ")}"
+
+
+
+  #
+  # private
+  #
 
 
 
   prepareOutgogingPayload: (message) =>
     meta:
-      workerId: @workerId
-      group:    @config.group
-    data:       message
+      processId: @processId
+      group:     @config.group
+    data:        message
 
 
 

@@ -22,12 +22,6 @@ cacheWorker.onGroup (message) =>
 # cacheWorker receives a private message
 cacheWorker.onPrivate (message) =>
 
-# cacheWorker publishs a message to channel
-cacheWorker.publish("channel", "message")
-
-# cacheWorker confirm to master
-cacheWorker.publish("confirmation", "cache")
-
 # cacheWorker spawns worker
 cacheWorker.spawn [
   { name: "cacheWorkerChild", file: "./cache_worker_child.coffee" }

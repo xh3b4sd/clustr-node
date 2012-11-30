@@ -20,9 +20,3 @@ cacheWorkerChild.onGroup (message) =>
 
 # cacheWorkerChild receives a private message
 cacheWorkerChild.onPrivate (message) =>
-
-# cacheWorkerChild publishs a message to channel
-cacheWorkerChild.publish("channel", "message")
-
-# cacheWorkerChild confirm to master
-cacheWorkerChild.publish("confirmation", "cacheWorkerChild")

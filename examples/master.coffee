@@ -16,20 +16,26 @@ master = Clustr.Master.create()
 # master receives a public message
 master.onPublic (message) =>
 
-# master receives a private message and kill that worker
-master.onPrivate (message) =>
-  master.killWorker(message.meta.workerId)
+# master receives a private message and kills worker
+master.onGroup (message) =>
+  master.emitKill(message.meta.processId)
 
 # master executes callback if "cacheWorker" was received 2 times
-master.onConfirmation 2, "cache", (message) =>
+master.onConfirmation 2, "cacheWorker", (message) =>
   # master kills the last confirmed worker
-  master.killWorker(message.meta.workerId, 1)
+  master.killWorker(message.meta.processId, 1)
 
-# master publishs a message to channel
-master.publish("channel", "message")
+# master publishs a public message to channel
+master.emitPublic("message")
+
+# master publishs a private message
+master.emitPrivate("processId", "message")
+
+# master publishs a group message
+master.emitGroup("group", "message")
 
 # master sends exit code 1 to an worker
-master.killWorker("workerId", 1)
+master.emitKill("processId", 1)
 
 # master spawns worker
 master.spawn [
