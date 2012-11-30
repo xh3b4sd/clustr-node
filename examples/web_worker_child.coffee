@@ -10,7 +10,7 @@ Clustr = require("../index")
 
 # create process called "webWorkerChild"
 webWorkerChild = Clustr.Worker.create
-  name: "webWorkerChild"
+  group: "webWorkerChild"
 
 # webWorkerChild receives a public message
 webWorkerChild.onPublic (message) =>

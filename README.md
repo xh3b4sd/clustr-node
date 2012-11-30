@@ -127,6 +127,15 @@ worker.spawn [
 
 
 
+Each process is able to kill another. For that action you need to know the
+unique `workerId` of the worker you want to kill. Each valid exit code, a
+process respects, can be send (0, 1, etc.). To send an exit code to an worker do.
+```coffeescript
+worker.killWorker(WORKER_ID, EXIT_CODE)
+```
+
+
+
 ### messages
 
 If a process receives a message it looks something like that.
@@ -135,11 +144,11 @@ message =
   meta:
     workerId: WORKER_ID
     group:    GROUP
-    dataType: DATA_TYPE
   data:       YOUR_MESSAGE
 ```
 
-Each meta item should be a string. The data you send to a channel, using the
+Each meta item should be a string. The `workerId` should not be provided if
+the message was sent by the master. The data you send to a channel, using the
 `publish` method, can be whatever is stringifyable. So you will be able to
 receive what you send. Note that confirmation messages should only be simple
 strings.

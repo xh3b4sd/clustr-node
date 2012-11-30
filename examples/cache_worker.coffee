@@ -11,7 +11,7 @@ Clustr = require("../index")
 
 # create process called "cacheWorker"
 cacheWorker = Clustr.Worker.create
-  name: "cacheWorker"
+  group: "cacheWorker"
 
 # cacheWorker receives a public message
 cacheWorker.onPublic (message) =>

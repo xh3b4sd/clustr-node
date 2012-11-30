@@ -11,7 +11,7 @@ Clustr = require("../index")
 
 # create process called "webWorker"
 webWorker = Clustr.Worker.create
-  name: "webWorker"
+  group: "webWorker"
 
 # webWorker receives a public message
 webWorker.onPublic (message) =>
@@ -22,11 +22,14 @@ webWorker.onGroup (message) =>
 # webWorker receives a private message
 webWorker.onPrivate (message) =>
 
-# webWorker publishs a message to channel
-webWorker.publish("channel", "message")
+# webWorker publishs a message to master
+webWorker.publish("master", "kill me")
 
 # webWorker confirm to master
 webWorker.publish("confirmation", "web")
+
+# webWorker sends exit code 1 to an worker
+webWorker.killWorker("workerId", 1)
 
 # webWorker spawns worker
 webWorker.spawn [

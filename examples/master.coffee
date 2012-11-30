@@ -11,20 +11,25 @@ Clustr = require("../index")
 
 
 # create the clusters master process
-master = Clustr.Master.create
-  name: "master"
+master = Clustr.Master.create()
 
 # master receives a public message
 master.onPublic (message) =>
 
-# master receives a private message
+# master receives a private message and kill that worker
 master.onPrivate (message) =>
+  master.killWorker(message.meta.workerId)
 
 # master executes callback if "cacheWorker" was received 2 times
-master.onConfirmation 2, "cache", () =>
+master.onConfirmation 2, "cache", (message) =>
+  # master kills the last confirmed worker
+  master.killWorker(message.meta.workerId, 1)
 
 # master publishs a message to channel
 master.publish("channel", "message")
+
+# master sends exit code 1 to an worker
+master.killWorker("workerId", 1)
 
 # master spawns worker
 master.spawn [

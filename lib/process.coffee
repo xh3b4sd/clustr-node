@@ -9,7 +9,14 @@ class exports.Process
     @publisher    = @config.publisher    or Redis.createClient()
     @subscriber   = @config.subscriber   or Redis.createClient()
 
-    @subscribe()
+    # subscribe to all channels
+    @subscriber.subscribe(channel) for channel in @channels
+
+
+
+  killWorker: (workerId, code = 0) =>
+    payload = @prepareOutgogingPayload(code)
+    @publisher.publish("kill:#{workerId}", JSON.stringify(payload))
 
 
 
@@ -19,15 +26,9 @@ class exports.Process
 
 
 
-  subscribe: () =>
-    @subscriber.subscribe(channel) for channel in @channels
-
-
-
   onPublic: (cb) =>
     @subscriber.on "message", (channel, payload) =>
-      return if channel isnt "public"
-      cb(JSON.parse(payload))
+      cb(JSON.parse(payload)) if channel is "public"
 
 
 

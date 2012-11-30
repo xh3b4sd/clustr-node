@@ -31,17 +31,16 @@ describe "confirmation", () =>
 
 
     it "should not execute callback on wrong channel", () =>
-      subCb("confirmations", identifier)
-      subCb("public", identifier)
-      subCb("private", identifier)
-      subCb("master", identifier)
+      subCb("private", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+      subCb("public",  '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+      subCb("master",  '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
       expect(cb.callCount).toEqual(0)
 
 
 
     it "should execute callback on 'confirmation' channel", () =>
-      subCb("confirmation", identifier)
+      subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
       expect(cb.callCount).toEqual(1)
 
@@ -64,17 +63,16 @@ describe "confirmation", () =>
 
 
     it "should not execute callback on wrong identifier", () =>
-      subCb("confirmation", "identifiers")
-      subCb("confirmation", "foo")
-      subCb("confirmation", "id")
-      subCb("confirmation", "master")
+      subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"web"}')
+      subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"identifiers"}')
+      subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"id"}')
 
       expect(cb.callCount).toEqual(0)
 
 
 
     it "should execute callback on correct identifier", () =>
-      subCb("confirmation", identifier)
+      subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
       expect(cb.callCount).toEqual(1)
 
@@ -97,15 +95,15 @@ describe "confirmation", () =>
 
 
     it "should not execute callback on the first confirmation", () =>
-      subCb("confirmation", identifier)
+      subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
       expect(cb.callCount).toEqual(0)
 
 
 
     it "should execute callback if all required confirmations were received", () =>
-      subCb("confirmation", identifier)
-      subCb("confirmation", identifier)
+      subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+      subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
       expect(cb.callCount).toEqual(1)
 
@@ -119,26 +117,26 @@ describe "confirmation", () =>
 
 
       it "should be able to receive confirmations 1 time", () =>
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
         expect(cb.callCount).toEqual(1)
 
       it "should be able to receive confirmations 2 time", () =>
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
         expect(cb.callCount).toEqual(2)
 
       it "should be able to receive confirmations 3 time", () =>
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
         expect(cb.callCount).toEqual(3)
 
@@ -161,24 +159,24 @@ describe "confirmation", () =>
 
 
     it "should not execute callback on the first confirmation", () =>
-      subCb("confirmation", identifier)
+      subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
       expect(cb.callCount).toEqual(0)
 
 
 
     it "should not execute callback on the second confirmation", () =>
-      subCb("confirmation", identifier)
-      subCb("confirmation", identifier)
+      subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+      subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
       expect(cb.callCount).toEqual(0)
 
 
 
     it "should execute callback if all required confirmations were received", () =>
-      subCb("confirmation", identifier)
-      subCb("confirmation", identifier)
-      subCb("confirmation", identifier)
+      subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+      subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+      subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
       expect(cb.callCount).toEqual(1)
 
@@ -192,31 +190,31 @@ describe "confirmation", () =>
 
 
       it "should be able to receive confirmations 1 time", () =>
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
         expect(cb.callCount).toEqual(1)
 
       it "should be able to receive confirmations 2 time", () =>
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
         expect(cb.callCount).toEqual(2)
 
       it "should be able to receive confirmations 3 time", () =>
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
-        subCb("confirmation", identifier)
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
         expect(cb.callCount).toEqual(3)

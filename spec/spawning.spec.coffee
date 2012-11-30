@@ -13,7 +13,6 @@ describe "spawning", () =>
 
     beforeEach () =>
       master = Clustr.Master.create
-        name: "master"
         publisher: Mock.pub()
         subscriber: Mock.sub()
         childProcess: Mock.chiPro()
@@ -127,7 +126,7 @@ describe "spawning", () =>
 
     beforeEach () =>
       worker = Clustr.Worker.create
-        name: "worker"
+        group: "worker"
         publisher: Mock.pub()
         subscriber: Mock.sub()
         childProcess: Mock.chiPro()

@@ -1,9 +1,8 @@
 Process = require("./process").Process
 
 class exports.Master extends Process
-  constructor: (@config) ->
-    @config.group = "master"
-    @channels     = [ @config.group, "public", "confirmation" ]
+  constructor: (@config = {}) ->
+    @channels = [ @config.group = "master", "public", "confirmation" ]
 
     @setup()
 
@@ -16,16 +15,17 @@ class exports.Master extends Process
 
   onPrivate: (cb) =>
     @subscriber.on "message", (channel, payload) =>
-      return if channel isnt @config.group
-      cb(JSON.parse(payload))
+      cb(JSON.parse(payload)) if channel is @config.group
 
 
 
   onConfirmation: (requiredMessages, identifier, cb) =>
     received = 0
-    @subscriber.on "message", (channel, message) =>
-      return if channel isnt "confirmation"
-      return if message isnt identifier
+    @subscriber.on "message", (channel, payload) =>
+      message = JSON.parse(payload)
+
+      return if channel      isnt "confirmation"
+      return if message.data isnt identifier
       return if ++received < requiredMessages
 
       received = 0
