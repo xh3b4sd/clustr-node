@@ -56,7 +56,7 @@ worker = Clustr.Worker.create
 ```
 
 
-#### onPublic
+__onPublic__
 
 Public messages are send to each living process. To make a worker listen to
 messages from the `public` channel do.
@@ -67,7 +67,7 @@ worker.onPublic (message) =>
 
 
 
-#### onPrivate
+__onPrivate__
 
 Private messages are for a specific worker only that is identified by its
 `processId` property. To make a worker listen to private messages do.
@@ -78,7 +78,7 @@ worker.onPrivate (message) =>
 
 
 
-#### onGroup
+__onGroup__
 
 Group messages are for a specific group only that is defined by its `group`
 property. To make a worker listen to group messages do. Note that the master
@@ -90,7 +90,7 @@ worker.onGroup (message) =>
 
 
 
-#### emitPublic
+__emitPublic__
 
 To make a worker publish a public message do.
 ```coffeescript
@@ -99,7 +99,7 @@ worker.emitPublic("message")
 
 
 
-#### emitPrivate
+__emitPrivate__
 
 To make a worker publish a private message do.
 ```coffeescript
@@ -108,7 +108,7 @@ worker.emitPrivate("processId", "message")
 
 
 
-#### emitGroup
+__emitGroup__
 
 To make a worker publish a group message do.
 ```coffeescript
@@ -117,7 +117,7 @@ worker.emitGroup("group", "message")
 
 
 
-#### emitConfirmation
+__emitConfirmation__
 
 To make a worker publish a confirmation message do.
 ```coffeescript
@@ -126,18 +126,20 @@ worker.emitConfirmation("message")
 
 
 
-#### emitKill
+__emitKill__
 
 Each process is able to kill another. For that action you need to know the
 unique `processId` of the worker you want to kill. Each valid exit code, a
-process respects, can be send (0, 1, etc.). To send an exit code to an worker do.
+process respects, can be send (0, 1, etc.). Be careful by sending the kill
+signal to the master process. That will terminate the whole cluster. To send
+an exit code to an worker do.
 ```coffeescript
 worker.emitKill("processId", EXIT_CODE)
 ```
 
 
 
-#### spawn
+__spawn__
 
 Each process is able to spawn workers, both, the `master` and `workers`.
 

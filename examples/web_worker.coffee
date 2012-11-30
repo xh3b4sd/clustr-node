@@ -23,7 +23,7 @@ webWorker.onGroup (message) =>
 webWorker.onPrivate (message) =>
 
 # webWorker publishs a message to master
-webWorker.emitGroup("master", "kill me")
+webWorker.emitGroup("master", "message")
 
 # webWorker confirm to master
 webWorker.emitConfirmation("webWorker")

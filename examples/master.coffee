@@ -18,12 +18,11 @@ master.onPublic (message) =>
 
 # master receives a private message and kills worker
 master.onGroup (message) =>
-  master.emitKill(message.meta.processId)
 
-# master executes callback if "cacheWorker" was received 2 times
-master.onConfirmation 2, "cacheWorker", (message) =>
+# master executes callback if "webWorker" was received 2 times
+master.onConfirmation 2, "webWorker", (message) =>
   # master kills the last confirmed worker
-  master.killWorker(message.meta.processId, 1)
+  master.emitKill(message.meta.processId, 1)
 
 # master publishs a public message to channel
 master.emitPublic("message")
