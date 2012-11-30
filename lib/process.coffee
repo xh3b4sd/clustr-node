@@ -41,9 +41,11 @@ class exports.Process
 
   setupKill: () =>
     @subscriber.on "message", (channel, payload) =>
+      return if channel isnt "kill:#{@processId}"
+
       message = JSON.parse(payload)
       # console.log("#{message.meta.group} kill #{@config.group} - exit code: #{message.data}")
-      process.exit(message.data) if channel is "kill:#{@processId}"
+      process.exit(message.data)
 
 
 
