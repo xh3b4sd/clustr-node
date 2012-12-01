@@ -4,7 +4,7 @@ Path         = require("path")
 Redis        = require("redis")
 ChildProcess = require("child_process")
 
-class exports.Process
+class exports.Worker
   constructor: (@config = {}) ->
     return @missingGroupNameError() if not @config.group?
 
@@ -43,7 +43,7 @@ class exports.Process
 
 
   @create: (config) =>
-    new Process(config)
+    new Worker(config)
 
 
 

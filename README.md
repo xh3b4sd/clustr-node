@@ -25,28 +25,6 @@ Clustr = require("clustr-node")
 
 
 
-### master
-
-Create the master process.
-```coffeescript
-master = Clustr.Master.create
-```
-
-
-
-The master is a normal process like all other workers. The only special thing
-is that the master is able to receive confirmations. To listen to a confirmation
-just do the following. As described, the callback is executed when the message
-"identifier" was received 2 times.
-```coffeescript
-master.onConfirmation 2, "identifier", () =>
-  # do something when message "identifier" was received 2 times
-```
-
-For more information see the next section `worker`.
-
-
-
 ### worker
 
 Create a worker process.
@@ -81,8 +59,7 @@ worker.onPrivate (message) =>
 __onGroup__
 
 Group messages are for a specific group only that is defined by its `group`
-property. To make a worker listen to group messages do. Note that the master
-is not able to receive group messages.
+property. To make a worker listen to group messages do.
 ```coffeescript
 worker.onGroup (message) =>
   # do something with group message when it was received
@@ -100,6 +77,16 @@ befor death do.
 worker.onKill (cb) =>
   # process last actions befor death
   cb()
+```
+
+
+
+Worker are able to receive confirmations. To listen to a confirmation just do
+the following. As described, the callback is executed when the message
+"identifier" was received 2 times.
+```coffeescript
+worker.onConfirmation 2, "identifier", () =>
+  # do something when message "identifier" was received 2 times
 ```
 
 
@@ -156,7 +143,7 @@ worker.emitKill("processId", 0)
 
 __spawn__
 
-Each process is able to spawn workers, both, `master` and `worker`.
+Each process is able to spawn workers.
 
 required:
 - `file` defines the file a worker should execute.
@@ -190,11 +177,9 @@ message =
   data:        YOUR_MESSAGE
 ```
 
-Each meta item should be a string. The `processId` should not be provided if
-the message was sent by the master. The data you send to a channel, using the
-`publish` method, can be whatever is stringifyable. So you will be able to
-receive what you send. Note that confirmation messages should only be simple
-strings.
+Each meta item should be a string. The data you send can be whatever is
+stringifyable. So you will be able to receive what you send. Note that
+confirmation messages should only be simple strings.
 
 
 

@@ -1,2 +1,2 @@
 var CoffeeScript = require("coffee-script");
-exports.Process = require("./lib/process").Process;
+exports.Worker = require("./lib/worker").Worker;

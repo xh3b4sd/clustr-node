@@ -11,7 +11,8 @@ Clustr = require("../index")
 
 
 # create the clusters master process
-master = Clustr.Master.create()
+master = Clustr.Worker.create
+  group: "master"
 
 # master executes callback if "webWorker" was received 2 times
 master.onConfirmation 2, "webWorker", (message) =>

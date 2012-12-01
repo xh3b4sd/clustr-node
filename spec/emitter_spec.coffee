@@ -3,8 +3,8 @@ Jasmine = require("jasmine-node")
 Mock    = require("./lib/mock")
 Clustr  = require("../index")
 
-describe "master emitter", () =>
-  [ master ] = []
+describe "emitter", () =>
+  [ worker ] = []
 
   dataTypes =
     string: "message"
@@ -13,7 +13,8 @@ describe "master emitter", () =>
     array:  [ "message", "array" ]
 
   beforeEach () =>
-    master = Clustr.Master.create
+    worker = Clustr.Worker.create
+      group:        "worker"
       uuid:         Mock.uuid()
       publisher:    Mock.pub()
       subscriber:   Mock.sub()
@@ -27,8 +28,8 @@ describe "master emitter", () =>
         [ channel, message ] = []
 
         beforeEach () =>
-          master.emitPublic(expectedMessage)
-          [ [ channel, message ] ] = master.publisher.publish.argsForCall
+          worker.emitPublic(expectedMessage)
+          [ [ channel, message ] ] = worker.publisher.publish.argsForCall
 
 
 
@@ -41,7 +42,7 @@ describe "master emitter", () =>
           expect(message).toEqual JSON.stringify
             meta:
               processId: "mocked-uuid"
-              group:     "master"
+              group:     "worker"
             data:        expectedMessage
 
 
@@ -52,8 +53,8 @@ describe "master emitter", () =>
         [ channel, message ] = []
 
         beforeEach () =>
-          master.emitPrivate("processId", expectedMessage)
-          [ [ channel, message ] ] = master.publisher.publish.argsForCall
+          worker.emitPrivate("processId", expectedMessage)
+          [ [ channel, message ] ] = worker.publisher.publish.argsForCall
 
 
 
@@ -66,7 +67,7 @@ describe "master emitter", () =>
           expect(message).toEqual JSON.stringify
             meta:
               processId: "mocked-uuid"
-              group:     "master"
+              group:     "worker"
             data:        expectedMessage
 
 
@@ -77,8 +78,8 @@ describe "master emitter", () =>
         [ channel, message ] = []
 
         beforeEach () =>
-          master.emitGroup("group", expectedMessage)
-          [ [ channel, message ] ] = master.publisher.publish.argsForCall
+          worker.emitGroup("group", expectedMessage)
+          [ [ channel, message ] ] = worker.publisher.publish.argsForCall
 
 
 
@@ -91,30 +92,49 @@ describe "master emitter", () =>
           expect(message).toEqual JSON.stringify
             meta:
               processId: "mocked-uuid"
-              group:     "master"
+              group:     "worker"
             data:        expectedMessage
 
 
 
   describe "kill emitter", () =>
     it "should publish on kill channel", () =>
-      master.emitKill("processId")
+      worker.emitKill("processId")
 
-      [ [ channel, message ] ] = master.publisher.publish.argsForCall
+      [ [ channel, message ] ] = worker.publisher.publish.argsForCall
       expect(channel).toEqual("kill:processId")
 
 
 
     it "should publish default exit code 0", () =>
-      master.emitKill("processId")
+      worker.emitKill("processId")
 
-      [ [ channel, message ] ] = master.publisher.publish.argsForCall
-      expect(message).toEqual('{"meta":{"processId":"mocked-uuid","group":"master"},"data":0}')
+      [ [ channel, message ] ] = worker.publisher.publish.argsForCall
+      expect(message).toEqual('{"meta":{"processId":"mocked-uuid","group":"worker"},"data":0}')
 
 
 
     it "should publish given exit code", () =>
-      master.emitKill("processId", 1)
+      worker.emitKill("processId", 1)
 
-      [ [ channel, message ] ] = master.publisher.publish.argsForCall
-      expect(message).toEqual('{"meta":{"processId":"mocked-uuid","group":"master"},"data":1}')
+      [ [ channel, message ] ] = worker.publisher.publish.argsForCall
+      expect(message).toEqual('{"meta":{"processId":"mocked-uuid","group":"worker"},"data":1}')
+
+
+
+  describe "confirmation emitter", () =>
+    [ channel, message ] = []
+
+    beforeEach () =>
+      worker.emitConfirmation("identifier")
+      [ [ channel, message ] ] = worker.publisher.publish.argsForCall
+
+
+
+    it "should publish correct channel", () =>
+      expect(channel).toEqual("confirmation")
+
+
+
+    it "should publish correct message", () =>
+      expect(message).toEqual('{"meta":{"processId":"mocked-uuid","group":"worker"},"data":"identifier"}')

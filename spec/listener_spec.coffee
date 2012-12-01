@@ -3,8 +3,8 @@ Jasmine = require("jasmine-node")
 Mock    = require("./lib/mock")
 Clustr  = require("../index")
 
-describe "master listener", () =>
-  [ master, requiredMessages, identifier, cb, subCb ] = []
+describe "listener", () =>
+  [ worker, requiredMessages, identifier, cb, subCb ] = []
 
   dataTypes =
     string: "message"
@@ -13,7 +13,8 @@ describe "master listener", () =>
     array:  [ "message", "array" ]
 
   beforeEach () =>
-    master = Clustr.Master.create
+    worker = Clustr.Worker.create
+      group:        "worker"
       uuid:         Mock.uuid()
       publisher:    Mock.pub()
       subscriber:   Mock.sub()
@@ -29,9 +30,9 @@ describe "master listener", () =>
         beforeEach () =>
           cb = jasmine.createSpy()
 
-          master.onPublic(cb)
+          worker.onPublic(cb)
           # the first subscription is caused by the kill listener
-          [ [], [ channel, subCb ] ] = master.subscriber.on.argsForCall
+          [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
 
 
 
@@ -41,21 +42,21 @@ describe "master listener", () =>
 
 
         it "should receive 1 messages", () =>
-          subCb("public", JSON.stringify({ meta: { processId: "processId", group: "master" }, data: expectedMessage }))
+          subCb("public", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
           expect(cb.callCount).toEqual(1)
 
 
 
         it "should receive correct messages", () =>
-          subCb("public",  JSON.stringify({ meta: { processId: "processId", group: "master" }, data: expectedMessage }))
-          expect(cb).toHaveBeenCalledWith({ meta: { processId: "processId", group: "master" }, data: expectedMessage })
+          subCb("public",  JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
+          expect(cb).toHaveBeenCalledWith({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage })
 
 
 
         it "should not receive messages on other channels", () =>
-          subCb("all",          JSON.stringify({ meta: { processId: "processId", group: "master" }, data: expectedMessage }))
-          subCb("private",      JSON.stringify({ meta: { processId: "processId", group: "master" }, data: expectedMessage }))
-          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "master" }, data: expectedMessage }))
+          subCb("all",          JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
+          subCb("private",      JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
+          subCb("confirmation", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
 
           expect(cb.callCount).toEqual(0)
 
@@ -69,9 +70,9 @@ describe "master listener", () =>
         beforeEach () =>
           cb = jasmine.createSpy()
 
-          master.onPrivate(cb)
+          worker.onPrivate(cb)
           # the first subscription is caused by the kill listener
-          [ [], [ channel, subCb ] ] = master.subscriber.on.argsForCall
+          [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
 
 
 
@@ -81,21 +82,21 @@ describe "master listener", () =>
 
 
         it "should receive 1 messages", () =>
-          subCb("private:mocked-uuid", JSON.stringify({ meta: { processId: "processId", group: "master" }, data: expectedMessage }))
+          subCb("private:mocked-uuid", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
           expect(cb.callCount).toEqual(1)
 
 
 
         it "should receive correct messages", () =>
-          subCb("private:mocked-uuid", JSON.stringify({ meta: { processId: "processId", group: "master" }, data: expectedMessage }))
-          expect(cb).toHaveBeenCalledWith(            { meta: { processId: "processId", group: "master" }, data: expectedMessage })
+          subCb("private:mocked-uuid", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
+          expect(cb).toHaveBeenCalledWith(            { meta: { workerId: "workerId", group: "worker" }, data: expectedMessage })
 
 
 
         it "should not receive messages on other channels", () =>
-          subCb("all",          JSON.stringify({ meta: { processId: "processId", group: "master" }, data: expectedMessage }))
-          subCb("public",       JSON.stringify({ meta: { processId: "processId", group: "master" }, data: expectedMessage }))
-          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "master" }, data: expectedMessage }))
+          subCb("all",          JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
+          subCb("public",       JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
+          subCb("confirmation", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
 
           expect(cb.callCount).toEqual(0)
 
@@ -109,9 +110,9 @@ describe "master listener", () =>
         beforeEach () =>
           cb = jasmine.createSpy()
 
-          master.onGroup(cb)
+          worker.onGroup(cb)
           # the first subscription is caused by the kill listener
-          [ [], [ channel, subCb ] ] = master.subscriber.on.argsForCall
+          [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
 
 
 
@@ -121,21 +122,21 @@ describe "master listener", () =>
 
 
         it "should receive 1 messages", () =>
-          subCb("group:master", JSON.stringify({ meta: { processId: "processId", group: "master" }, data: expectedMessage }))
+          subCb("group:worker", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
           expect(cb.callCount).toEqual(1)
 
 
 
         it "should receive correct messages", () =>
-          subCb("group:master", JSON.stringify({ meta: { processId: "processId", group: "master" }, data: expectedMessage }))
-          expect(cb).toHaveBeenCalledWith(            { meta: { processId: "processId", group: "master" }, data: expectedMessage })
+          subCb("group:worker", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
+          expect(cb).toHaveBeenCalledWith(            { meta: { workerId: "workerId", group: "worker" }, data: expectedMessage })
 
 
 
         it "should not receive messages on other channels", () =>
-          subCb("all",          JSON.stringify({ meta: { processId: "processId", group: "master" }, data: expectedMessage }))
-          subCb("public",       JSON.stringify({ meta: { processId: "processId", group: "master" }, data: expectedMessage }))
-          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "master" }, data: expectedMessage }))
+          subCb("all",          JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
+          subCb("public",       JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
+          subCb("confirmation", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
 
           expect(cb.callCount).toEqual(0)
 
@@ -148,9 +149,9 @@ describe "master listener", () =>
         identifier = "identifier"
         cb = jasmine.createSpy()
 
-        master.onConfirmation(requiredMessages, identifier, cb)
+        worker.onConfirmation(requiredMessages, identifier, cb)
         # the first subscription is caused by the kill listener
-        [ [], [ channel, subCb ] ] = master.subscriber.on.argsForCall
+        [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
 
 
 
@@ -162,7 +163,7 @@ describe "master listener", () =>
       it "should not execute callback on wrong channel", () =>
         subCb("private", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
         subCb("public",  '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-        subCb("master",  '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("worker", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
         expect(cb.callCount).toEqual(0)
 
@@ -181,9 +182,9 @@ describe "master listener", () =>
         identifier = "identifier"
         cb = jasmine.createSpy()
 
-        master.onConfirmation(requiredMessages, identifier, cb)
+        worker.onConfirmation(requiredMessages, identifier, cb)
         # the first subscription is caused by the kill listener
-        [ [], [ channel, subCb ] ] = master.subscriber.on.argsForCall
+        [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
 
 
 
@@ -214,9 +215,9 @@ describe "master listener", () =>
         identifier = "identifier"
         cb = jasmine.createSpy()
 
-        master.onConfirmation(requiredMessages, identifier, cb)
+        worker.onConfirmation(requiredMessages, identifier, cb)
         # the first subscription is caused by the kill listener
-        [ [], [ channel, subCb ] ] = master.subscriber.on.argsForCall
+        [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
 
 
 
@@ -242,9 +243,9 @@ describe "master listener", () =>
 
       describe "repetition", () =>
         beforeEach () =>
-          master.onConfirmation(requiredMessages, identifier, cb)
+          worker.onConfirmation(requiredMessages, identifier, cb)
           # the first subscription is caused by the kill listener
-          [ [], [ channel, subCb ] ] = master.subscriber.on.argsForCall
+          [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
 
 
 
@@ -280,9 +281,9 @@ describe "master listener", () =>
         identifier = "identifier"
         cb = jasmine.createSpy()
 
-        master.onConfirmation(requiredMessages, identifier, cb)
+        worker.onConfirmation(requiredMessages, identifier, cb)
         # the first subscription is caused by the kill listener
-        [ [], [ channel, subCb ] ] = master.subscriber.on.argsForCall
+        [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
 
 
 
@@ -317,9 +318,9 @@ describe "master listener", () =>
 
       describe "repetition", () =>
         beforeEach () =>
-          master.onConfirmation(requiredMessages, identifier, cb)
+          worker.onConfirmation(requiredMessages, identifier, cb)
           # the first subscription is caused by the kill listener
-          [ [], [ channel, subCb ] ] = master.subscriber.on.argsForCall
+          [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
 
 
 
@@ -352,3 +353,43 @@ describe "master listener", () =>
           subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
 
           expect(cb.callCount).toEqual(3)
+
+
+
+  describe "kill listener", () =>
+    [ channel, subCb ] = []
+
+    beforeEach () =>
+      spyOn(process, "exit")
+
+      # the first subscription is caused by the kill listener
+      [ [ channel, subCb ] ] = worker.subscriber.on.argsForCall
+
+
+
+    it "should kill worker on kill channel", () =>
+      subCb("kill:mocked-uuid", '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":0}')
+      expect(process.exit.callCount).toEqual(1)
+
+
+
+    it "should not kill worker on other channels", () =>
+      subCb("mocked-uuid", '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":0}')
+      subCb("kill-uuid",   '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":1}')
+      subCb("public",      '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":2}')
+      subCb("private",     '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":3}')
+      subCb("worker",     '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":4}')
+
+      expect(process.exit.callCount).toEqual(0)
+
+
+
+    it "should kill worker with exit code 0", () =>
+      subCb("kill:mocked-uuid", '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":0}')
+      expect(process.exit).toHaveBeenCalledWith(0)
+
+
+
+    it "should kill worker with exit code 1", () =>
+      subCb("kill:mocked-uuid", '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":1}')
+      expect(process.exit).toHaveBeenCalledWith(1)
