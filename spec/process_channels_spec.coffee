@@ -3,27 +3,27 @@ Jasmine = require("jasmine-node")
 Mock    = require("./lib/mock")
 Clustr  = require("../index")
 
-describe "worker channels", () =>
-  [ worker, channels ] = []
+describe "process channels", () =>
+  [ process, channels ] = []
 
   beforeEach () =>
-    worker = Clustr.Process.create
-      group:        "worker"
+    process = Clustr.Process.create
+      group:        "process"
       uuid:         Mock.uuid()
       publisher:    Mock.pub()
       subscriber:   Mock.sub()
       childProcess: Mock.chiPro()
 
-    channels = _.flatten(worker.subscriber.subscribe.argsForCall)
+    channels = _.flatten(process.subscriber.subscribe.argsForCall)
 
 
 
   it "should provide list of channels", () =>
-    expect(worker.channels).toEqual [
+    expect(process.channels).toEqual [
       "confirmation"
       "public"
       "private:mocked-uuid"
-      "group:worker"
+      "group:process"
       "kill:mocked-uuid"
     ]
 
@@ -45,7 +45,7 @@ describe "worker channels", () =>
 
 
   it "should subscribe to group channel", () =>
-    expect(channels).toContain("group:worker")
+    expect(channels).toContain("group:process")
 
 
 
