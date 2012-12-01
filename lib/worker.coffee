@@ -13,6 +13,7 @@ class exports.Worker
       emitPrivate:             0
       emitGroup:               0
       emitKill:                0
+      emitConfirmation:        0
       onMessage:               0
       onPublic:                0
       onGroup:                 0
@@ -116,7 +117,7 @@ class exports.Worker
   emitConfirmation: (message) =>
     payload = @prepareOutgogingPayload(message)
     @publisher.publish("confirmation", JSON.stringify(payload))
-    @stats.emitPublic++
+    @stats.emitConfirmation++
 
 
 
@@ -156,16 +157,6 @@ class exports.Worker
 
 
 
-  onKill: (cb) =>
-    @onKillCb = cb
-
-
-
-  onKillCb: (cb) =>
-    cb()
-
-
-
   onConfirmation: (requiredMessages, identifier, cb) =>
     received = 0
     @subscriber.on "message", (channel, payload) =>
@@ -182,6 +173,16 @@ class exports.Worker
       received = 0
       cb(message)
       @stats.successfulConfirmations++
+
+
+
+  onKill: (cb) =>
+    @onKillCb = cb
+
+
+
+  onKillCb: (cb) =>
+    cb()
 
 
 
