@@ -14,10 +14,10 @@ describe "spawning", () =>
       childProcess: Mock.chiPro()
 
     worker.spawn [
-      { file: "./web_worker.js" }
-      { file: "./web_worker.js",       cpu: 1 }
-      { file: "./cache_worker.coffee",         command: "coffee" }
-      { file: "./cache_worker.coffee", cpu: 2, command: "coffee" }
+      { file: "./web_worker.js"                                                  }
+      { file: "./web_worker.js",       cpu: 1                                    }
+      { file: "./cache_worker.coffee",         command: "coffee", respawn: false }
+      { file: "./cache_worker.coffee", cpu: 2, command: "coffee"                 }
     ]
 
     [ callOne, callTwo, callThree, callFour, callFive, callSix ] = worker.childProcess.spawn.argsForCall
@@ -75,7 +75,7 @@ describe "spawning", () =>
 
 
 
-  describe "respawning", () =>
+  describe "respawning enabled by default", () =>
     [ workerChild, eventNameTwo, eventCbTwo ] = []
 
     beforeEach () =>
@@ -114,3 +114,45 @@ describe "spawning", () =>
 
         # 6. spawn() should cause respawning of 2. worker
         expect(argsTwo).toEqual(argsSixth)
+
+
+
+  describe "respawning disabled", () =>
+    [ workerChild, eventNameTwo, eventCbTwo ] = []
+
+    beforeEach () =>
+      # cause 5. spawn()
+      workerChild = worker.childProcess.spawn()
+      [ [], [], [ eventNameTwo, eventCbTwo ] ] = workerChild.on.argsForCall
+
+
+
+    describe "exit code 1", () =>
+      it "should use correct event name", () =>
+        expect(eventNameTwo).toEqual("exit")
+
+
+
+      it "should not respawn worker", () =>
+        # send exit code 0 to 3. worker and cause 6. spawn()
+        eventCbTwo(0)
+        [ [], [], [], [], [], argsSixth ] = worker.childProcess.spawn.argsForCall
+
+        # 6. spawn() should not cause respawning of 3. worker
+        expect(argsSixth).toBeUndefined()
+
+
+
+    describe "exit code 9", () =>
+      it "should use correct event name", () =>
+        expect(eventNameTwo).toEqual("exit")
+
+
+
+      it "should not respawn worker", () =>
+        # send exit code 0 to 3. worker and cause 6. spawn()
+        eventCbTwo(9)
+        [ [], [], [], [], [], argsSixth ] = worker.childProcess.spawn.argsForCall
+
+        # 6. spawn() should not cause respawning of 3. worker
+        expect(argsSixth).toBeUndefined()
