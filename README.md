@@ -156,24 +156,24 @@ worker.emitKill("processId", 0)
 
 __spawn__
 
-Each process is able to spawn workers, both, the `master` and `workers`.
+Each process is able to spawn workers, both, `master` and `worker`.
 
-- Spawning a worker __requires__ a `file` the worker should execute.
-- __Optionally__ workers can be cpu bound. To do so, set `cpu` to one of your
-cores (0, 1, 2, 3, etc.). Cpu affinity is set using the `taskset` command,
-which only works under unix systems.
-- __Optionally__ a process can be executed using a special `command`. Otherwise
-the new process will be executed using the parents execution command.
+required:
+- `file` defines the file a worker should execute.
 
-To make a worker spawn workers, do
-something like that.
+optional:
+- `cpu` set cpu affinity using the `taskset` command, which only works under unix systems.
+- `command` defines the command that executes `file`. By default `file` will be executed using the parents execution command.
+- `respawn` by default is set to `true`. To prevent respawning a worker set `respawn` to `false`.
+
+To make a worker spawn workers, do something like that.
 ```coffeescript
 worker.spawn [
-  { file: "./web_worker.coffee",   cpu: 1          }
-  { file: "./web_worker.coffee",   cpu: 1          }
-  { file: "./cache_worker.coffee", cpu: 2          }
-  { file: "./cache_worker.coffee", cpu: 2          }
-  { file: "./bashscript",          command: "bash" }
+  { file: "./web_worker.coffee",   cpu: 0                          }
+  { file: "./web_worker.coffee",   cpu: 1                          }
+  { file: "./cache_worker.coffee", cpu: 2,          respawn: false }
+  { file: "./cache_worker.coffee", cpu: 3,          respawn: false }
+  { file: "./bashscript",          command: "bash"                 }
 ]
 ```
 

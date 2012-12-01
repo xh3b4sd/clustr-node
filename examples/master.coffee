@@ -16,18 +16,26 @@ master = Clustr.Master.create()
 # master executes callback if "webWorker" was received 2 times
 master.onConfirmation 2, "webWorker", (message) =>
   # master kills the last confirmed worker
-  master.emitKill(message.meta.processId, exitCode = 0)
+  master.emitKill(message.meta.processId, exitCode = 1)
 
 # master executes callback if "cacheWorker" was received 2 times
 master.onConfirmation 2, "cacheWorker", (message) =>
   # master kills the last confirmed worker
-  master.emitKill(message.meta.processId, exitCode = 0)
+  master.emitKill(message.meta.processId, exitCode = 1)
 
 # master spawns worker
 master.spawn [
-  { file: "./web_worker.coffee",   cpu: 1          }
-  { file: "./web_worker.coffee",   cpu: 1          }
-  { file: "./cache_worker.coffee", cpu: 2          }
-  { file: "./cache_worker.coffee", cpu: 2          }
-  { file: "./bashscript",          command: "bash" }
+  { file: "./web_worker.coffee",   cpu: 0                          }
+  { file: "./web_worker.coffee",   cpu: 1                          }
+  { file: "./cache_worker.coffee", cpu: 2,          respawn: false }
+  { file: "./cache_worker.coffee", cpu: 3,          respawn: false }
+  { file: "./bashscript",          command: "bash"                 }
 ]
+
+console.log "master stats:"
+console.log master.stats
+
+setTimeout () =>
+  console.log "master stats:"
+  console.log master.stats
+, 2000

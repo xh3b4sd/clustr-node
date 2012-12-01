@@ -7,18 +7,20 @@ ChildProcess = require("child_process")
 class exports.Process
   setup: () =>
     @stats =
-      emitPublic:          0
-      emitPrivate:         0
-      emitGroup:           0
-      emitKill:            0
-      onPublic:            0
-      onGroup:             0
-      onPrivate:           0
-      onConfirmation:      0
-      spawnChildProcess:   0
-      respawnChildProcess: 0
+      emitPublic:              0
+      emitPrivate:             0
+      emitGroup:               0
+      emitKill:                0
+      onMessage:               0
+      onPublic:                0
+      onGroup:                 0
+      onPrivate:               0
+      spawnChildProcess:       0
+      respawnChildProcess:     0
+      receivedConfirmations:   0
+      successfulConfirmations: 0
 
-    @children     = []
+    @workerPids   = []
     @processId    = @config.uuid?.v4()   or Uuid.v4()
     @childProcess = @config.childProcess or ChildProcess
     @publisher    = @config.publisher    or Redis.createClient()
@@ -57,8 +59,8 @@ class exports.Process
     return if process.listeners("exit").length is 1
 
     process.on "exit", (code) =>
-      process.kill(pid, "SIGTERM") for pid in @children
-      # console.log "#{@config.group} and #{@children.length} children killed"
+      process.kill(pid, "SIGTERM") for pid in @workerPids
+      # console.log "#{@config.group} and #{@workerPids.length} children killed"
 
 
 
@@ -110,6 +112,7 @@ class exports.Process
 
   onPublic: (cb) =>
     @subscriber.on "message", (channel, payload) =>
+      @stats.onMessage++
       return if channel isnt "public"
 
       cb(JSON.parse(payload))
@@ -119,6 +122,7 @@ class exports.Process
 
   onPrivate: (cb) =>
     @subscriber.on "message", (channel, payload) =>
+      @stats.onMessage++
       return if channel isnt "private:#{@processId}"
 
       cb(JSON.parse(payload))
@@ -128,6 +132,7 @@ class exports.Process
 
   onGroup: (cb) =>
     @subscriber.on "message", (channel, payload) =>
+      @stats.onMessage++
       return if channel isnt "group:#{@config.group}"
 
       cb(JSON.parse(payload))
@@ -151,8 +156,7 @@ class exports.Process
 
 
   spawn: (workers) =>
-    @prepareChildProcess workers, (command, args) =>
-      @spawnChildProcess(command, args)
+    @prepareChildProcess(workers, @spawnChildProcess)
 
 
 
@@ -171,7 +175,8 @@ class exports.Process
       # change worker command
       command = worker.command if worker.command?
 
-      if _.has(worker, "cpu")
+      # set cpu affinity
+      if "cpu" of worker
         args = [ "-c", worker.cpu, command ]
         command = "taskset"
 
@@ -179,27 +184,29 @@ class exports.Process
       return @missingWorkerFileError() if not worker.file?
       args.push(Path.resolve(filename, "../", worker.file))
 
-      cb(command, args)
+      cb.call(@, command, args, worker.respawn)
 
 
 
-  spawnChildProcess: (command, args) =>
+  spawnChildProcess: (command, args, respawn) =>
     worker = @childProcess.spawn(command, args)
-    @children.push(worker.pid)
-    @stats.spawnChildProcess++
     # console.log "spawned worker: command: #{command} #{args.join(" ")}"
 
+    @workerPids.push(worker.pid)
+    @stats.spawnChildProcess++
+
     worker.stdout.on "data", (data) =>
-      console.log(data.toString())
+      console.log("stdout:", data.toString())
 
     worker.stderr.on "data", (data) =>
-      console.log(data.toString())
+      console.log("stderr:", data.toString())
 
     # respawn worker
     worker.on "exit", (code) =>
-      return if code is 0
+      return if code is 0        # worker ends as expected
+      return if respawn is false # worker shouldn`t respawn
 
-      @spawnChildProcess(command, args)
+      @spawnChildProcess(command, args, respawn)
       @stats.respawnChildProcess++
       # console.log "respawn worker: code: #{code} command: #{command} #{args.join(" ")}"
 
