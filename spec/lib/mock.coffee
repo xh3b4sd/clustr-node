@@ -6,12 +6,14 @@ module.exports =
 
   pub: () =>
     publish: jasmine.createSpy()
+    quit:    jasmine.createSpy()
 
 
 
   sub: () =>
     on:        jasmine.createSpy()
     subscribe: jasmine.createSpy()
+    quit:      jasmine.createSpy()
 
 
 

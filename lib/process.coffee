@@ -18,6 +18,7 @@ class exports.Process
       spawnChildProcess:   0
       respawnChildProcess: 0
 
+    @children     = []
     @processId    = @config.uuid?.v4()   or Uuid.v4()
     @childProcess = @config.childProcess or ChildProcess
     @publisher    = @config.publisher    or Redis.createClient()
@@ -31,6 +32,7 @@ class exports.Process
 
     @setupSubscriptions()
     @setupKill()
+    @setupKillChildren()
 
 
 
@@ -43,9 +45,26 @@ class exports.Process
     @subscriber.on "message", (channel, payload) =>
       return if channel isnt "kill:#{@processId}"
 
-      message = JSON.parse(payload)
-      # console.log("#{message.meta.group} kill #{@config.group} - exit code: #{message.data}")
-      process.exit(message.data)
+      @onKillCb () =>
+        message = JSON.parse(payload)
+        # console.log("#{message.meta.group} kill #{@config.group} - pid: #{process.pid} - exit code: #{message.data}")
+        process.exit(message.data)
+
+
+
+  setupKillChildren: () =>
+    # prevent event emitter memory leaking
+    return if process.listeners("exit").length is 1
+
+    process.on "exit", (code) =>
+      process.kill(pid, "SIGTERM") for pid in @children
+      # console.log "#{@config.group} and #{@children.length} children killed"
+
+
+
+  close: () =>
+    @publisher.quit()
+    @subscriber.quit()
 
 
 
@@ -116,6 +135,15 @@ class exports.Process
 
 
 
+  onKill: (cb) =>
+    @onKillCb = cb
+
+
+
+  onKillCb: (cb) =>
+    cb()
+
+
   #
   # spawning
   #
@@ -157,6 +185,7 @@ class exports.Process
 
   spawnChildProcess: (command, args) =>
     worker = @childProcess.spawn(command, args)
+    @children.push(worker.pid)
     @stats.spawnChildProcess++
     # console.log "spawned worker: command: #{command} #{args.join(" ")}"
 

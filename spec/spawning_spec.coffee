@@ -13,8 +13,8 @@ describe "spawning", () =>
 
     beforeEach () =>
       master = Clustr.Master.create
-        publisher: Mock.pub()
-        subscriber: Mock.sub()
+        publisher:    Mock.pub()
+        subscriber:   Mock.sub()
         childProcess: Mock.chiPro()
 
       master.spawn [

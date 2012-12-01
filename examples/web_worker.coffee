@@ -13,23 +13,13 @@ Clustr = require("../index")
 webWorker = Clustr.Worker.create
   group: "webWorker"
 
-# webWorker receives a public message
-webWorker.onPublic (message) =>
-
-# webWorker receives a group message
-webWorker.onGroup (message) =>
-
-# webWorker receives a private message
-webWorker.onPrivate (message) =>
-
-# webWorker publishs a message to master
-webWorker.emitGroup("master", "message")
-
 # webWorker confirm to master
 webWorker.emitConfirmation("webWorker")
 
-# webWorker sends exit code 1 to an worker
-webWorker.emitKill("processId", 1)
+# webWorker do his last action before his own termination
+webWorker.onKill (cb) =>
+  #console.log("that is webWorker´s last message before termination")
+  cb()
 
 # webWorker spawns worker
 webWorker.spawn [

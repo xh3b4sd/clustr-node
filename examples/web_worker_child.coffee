@@ -20,6 +20,3 @@ webWorkerChild.onGroup (message) =>
 
 # webWorkerChild receives a private message
 webWorkerChild.onPrivate (message) =>
-
-# webWorkerChild confirm to master
-webWorkerChild.emitConfirmation("webWorkerChild")

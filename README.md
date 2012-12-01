@@ -90,6 +90,20 @@ worker.onGroup (message) =>
 
 
 
+__onKill__
+
+Before a worker dies, it is possible to do something before. Here it is
+necessary to execute the `cb` given to the `onKill` method. If the callback is
+not fired, the process will __not__ die. To let a worker do his last action
+befor death do.
+```coffeescript
+worker.onKill (cb) =>
+  # process last actions befor death
+  cb()
+```
+
+
+
 __emitPublic__
 
 To make a worker publish a public message do.
@@ -129,12 +143,13 @@ worker.emitConfirmation("message")
 __emitKill__
 
 Each process is able to kill another. For that action you need to know the
-unique `processId` of the worker you want to kill. Each valid exit code, a
-process respects, can be send (0, 1, etc.). Be careful by sending the kill
-signal to the master process. That will terminate the whole cluster. To send
-an exit code to an worker do.
+unique `processId` of the worker you want to kill. `processId` here is __not__
+the systems `pid`. Each valid `exitCode`, a process respects, can be send
+(0, 1, etc.). `exitCode` defaults to 0. Killing a worker will terminate its
+children too. So be careful by sending a kill signal to the master process.
+That will terminate the whole cluster. To send an exit code to an worker do.
 ```coffeescript
-worker.emitKill("processId", EXIT_CODE)
+worker.emitKill(`processId`, `exitCode`)
 ```
 
 
