@@ -149,7 +149,7 @@ the systems `pid`. Each valid `exitCode`, a process respects, can be send
 children too. So be careful by sending a kill signal to the master process.
 That will terminate the whole cluster. To send an exit code to an worker do.
 ```coffeescript
-worker.emitKill(`processId`, `exitCode`)
+worker.emitKill("processId", 0)
 ```
 
 
