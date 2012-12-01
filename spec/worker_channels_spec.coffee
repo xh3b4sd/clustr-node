@@ -7,7 +7,7 @@ describe "worker channels", () =>
   [ worker, channels ] = []
 
   beforeEach () =>
-    worker = Clustr.Worker.create
+    worker = Clustr.Process.create
       group:        "worker"
       uuid:         Mock.uuid()
       publisher:    Mock.pub()
@@ -15,6 +15,22 @@ describe "worker channels", () =>
       childProcess: Mock.chiPro()
 
     channels = _.flatten(worker.subscriber.subscribe.argsForCall)
+
+
+
+  it "should provide list of channels", () =>
+    expect(worker.channels).toEqual [
+      "confirmation"
+      "public"
+      "private:mocked-uuid"
+      "group:worker"
+      "kill:mocked-uuid"
+    ]
+
+
+
+  it "should subscribe to confirmation channel", () =>
+    expect(channels).toContain("confirmation")
 
 
 
@@ -38,5 +54,5 @@ describe "worker channels", () =>
 
 
 
-  it "should only subscribe to 4 channels", () =>
-    expect(channels.length).toEqual(4)
+  it "should only subscribe to 5 channels", () =>
+    expect(channels.length).toEqual(5)

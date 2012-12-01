@@ -5,7 +5,9 @@ Redis        = require("redis")
 ChildProcess = require("child_process")
 
 class exports.Process
-  setup: () =>
+  constructor: (@config = {}) ->
+    return @missingGroupNameError() if not @config.group?
+
     @stats =
       emitPublic:              0
       emitPrivate:             0
@@ -20,21 +22,28 @@ class exports.Process
       receivedConfirmations:   0
       successfulConfirmations: 0
 
-    @workerPids   = []
     @processId    = @config.uuid?.v4()   or Uuid.v4()
     @childProcess = @config.childProcess or ChildProcess
     @publisher    = @config.publisher    or Redis.createClient()
     @subscriber   = @config.subscriber   or Redis.createClient()
 
-    @channels ?= []
-    @channels.push("public")
-    @channels.push("private:#{@processId}")
-    @channels.push("group:#{@config.group}")
-    @channels.push("kill:#{@processId}")
+    @workerPids   = []
+    @channels     = [
+      "confirmation"
+      "public"
+      "private:#{@processId}"
+      "group:#{@config.group}"
+      "kill:#{@processId}"
+    ]
 
     @setupSubscriptions()
     @setupKill()
     @setupKillChildren()
+
+
+
+  @create: (config) =>
+    new Process(config)
 
 
 
@@ -104,6 +113,13 @@ class exports.Process
 
 
 
+  emitConfirmation: (message) =>
+    payload = @prepareOutgogingPayload(message)
+    @publisher.publish("confirmation", JSON.stringify(payload))
+    @stats.emitPublic++
+
+
+
   #
   # listener
   #
@@ -147,6 +163,26 @@ class exports.Process
 
   onKillCb: (cb) =>
     cb()
+
+
+
+  onConfirmation: (requiredMessages, identifier, cb) =>
+    received = 0
+    @subscriber.on "message", (channel, payload) =>
+      @stats.onMessage++
+
+      message = JSON.parse(payload)
+      return if channel      isnt "confirmation"
+      return if message.data isnt identifier
+
+      @stats.receivedConfirmations++
+
+      return if ++received < requiredMessages
+
+      received = 0
+      cb(message)
+      @stats.successfulConfirmations++
+
 
 
   #
@@ -228,3 +264,8 @@ class exports.Process
 
   missingWorkerFileError: () =>
     throw new Error("worker file is missing")
+
+
+
+  missingGroupNameError: () =>
+    throw new Error("group name is missing")
