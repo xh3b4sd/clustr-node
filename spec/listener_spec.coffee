@@ -42,21 +42,21 @@ describe "listener", () =>
 
 
         it "should receive 1 messages", () =>
-          subCb("public", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
+          subCb("public", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
           expect(cb.callCount).toEqual(1)
 
 
 
         it "should receive correct messages", () =>
-          subCb("public",  JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
-          expect(cb).toHaveBeenCalledWith({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage })
+          subCb("public",  JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
+          expect(cb).toHaveBeenCalledWith({ meta: { processId: "processId", group: "worker" }, data: expectedMessage })
 
 
 
         it "should not receive messages on other channels", () =>
-          subCb("all",          JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
-          subCb("private",      JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
-          subCb("confirmation", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
+          subCb("all",          JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
+          subCb("private",      JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
 
           expect(cb.callCount).toEqual(0)
 
@@ -82,21 +82,21 @@ describe "listener", () =>
 
 
         it "should receive 1 messages", () =>
-          subCb("private:mocked-uuid", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
+          subCb("private:mocked-uuid", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
           expect(cb.callCount).toEqual(1)
 
 
 
         it "should receive correct messages", () =>
-          subCb("private:mocked-uuid", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
-          expect(cb).toHaveBeenCalledWith(            { meta: { workerId: "workerId", group: "worker" }, data: expectedMessage })
+          subCb("private:mocked-uuid", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
+          expect(cb).toHaveBeenCalledWith(            { meta: { processId: "processId", group: "worker" }, data: expectedMessage })
 
 
 
         it "should not receive messages on other channels", () =>
-          subCb("all",          JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
-          subCb("public",       JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
-          subCb("confirmation", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
+          subCb("all",          JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
+          subCb("public",       JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
 
           expect(cb.callCount).toEqual(0)
 
@@ -122,21 +122,21 @@ describe "listener", () =>
 
 
         it "should receive 1 messages", () =>
-          subCb("group:worker", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
+          subCb("group:worker", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
           expect(cb.callCount).toEqual(1)
 
 
 
         it "should receive correct messages", () =>
-          subCb("group:worker", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
-          expect(cb).toHaveBeenCalledWith(            { meta: { workerId: "workerId", group: "worker" }, data: expectedMessage })
+          subCb("group:worker", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
+          expect(cb).toHaveBeenCalledWith(     { meta: { processId: "processId", group: "worker" }, data: expectedMessage })
 
 
 
         it "should not receive messages on other channels", () =>
-          subCb("all",          JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
-          subCb("public",       JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
-          subCb("confirmation", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: expectedMessage }))
+          subCb("all",          JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
+          subCb("public",       JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
 
           expect(cb.callCount).toEqual(0)
 
@@ -161,16 +161,16 @@ describe "listener", () =>
 
 
       it "should not execute callback on wrong channel", () =>
-        subCb("private", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-        subCb("public",  '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-        subCb("worker", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("private", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+        subCb("public",  JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+        subCb("worker",  JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
 
         expect(cb.callCount).toEqual(0)
 
 
 
       it "should execute callback on 'confirmation' channel", () =>
-        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
 
         expect(cb.callCount).toEqual(1)
 
@@ -194,17 +194,16 @@ describe "listener", () =>
 
 
       it "should not execute callback on wrong identifier", () =>
-        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"web"}')
-        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"identifiers"}')
-        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"id"}')
+        subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: "web" }))
+        subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: 5 }))
+        subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: [ "foo" ] }))
 
         expect(cb.callCount).toEqual(0)
 
 
 
       it "should execute callback on correct identifier", () =>
-        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-
+        subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
         expect(cb.callCount).toEqual(1)
 
 
@@ -227,15 +226,14 @@ describe "listener", () =>
 
 
       it "should not execute callback on the first confirmation", () =>
-        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-
+        subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
         expect(cb.callCount).toEqual(0)
 
 
 
       it "should execute callback if all required confirmations were received", () =>
-        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+        subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
 
         expect(cb.callCount).toEqual(1)
 
@@ -250,26 +248,26 @@ describe "listener", () =>
 
 
         it "should be able to receive confirmations 1 time", () =>
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
 
           expect(cb.callCount).toEqual(1)
 
         it "should be able to receive confirmations 2 time", () =>
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
 
           expect(cb.callCount).toEqual(2)
 
         it "should be able to receive confirmations 3 time", () =>
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
 
           expect(cb.callCount).toEqual(3)
 
@@ -293,24 +291,23 @@ describe "listener", () =>
 
 
       it "should not execute callback on the first confirmation", () =>
-        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-
+        subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
         expect(cb.callCount).toEqual(0)
 
 
 
       it "should not execute callback on the second confirmation", () =>
-        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+        subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
 
         expect(cb.callCount).toEqual(0)
 
 
 
       it "should execute callback if all required confirmations were received", () =>
-        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-        subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+        subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+        subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+        subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
 
         expect(cb.callCount).toEqual(1)
 
@@ -325,32 +322,32 @@ describe "listener", () =>
 
 
         it "should be able to receive confirmations 1 time", () =>
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
 
           expect(cb.callCount).toEqual(1)
 
         it "should be able to receive confirmations 2 time", () =>
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
 
           expect(cb.callCount).toEqual(2)
 
         it "should be able to receive confirmations 3 time", () =>
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
-          subCb("confirmation", '{"meta":{"workerId":"mocked-uuid","group":"webWorker"},"data":"' + identifier + '"}')
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
+          subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
 
           expect(cb.callCount).toEqual(3)
 
@@ -368,28 +365,42 @@ describe "listener", () =>
 
 
     it "should kill worker on kill channel", () =>
-      subCb("kill:mocked-uuid", '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":0}')
+      subCb("kill:mocked-uuid", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 0 }))
       expect(process.exit.callCount).toEqual(1)
 
 
 
     it "should not kill worker on other channels", () =>
-      subCb("mocked-uuid", '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":0}')
-      subCb("kill-uuid",   '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":1}')
-      subCb("public",      '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":2}')
-      subCb("private",     '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":3}')
-      subCb("worker",     '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":4}')
+      subCb("mocked-uuid", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 0 }))
+      subCb("kill-uuid",   JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 1 }))
+      subCb("public",      JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 2 }))
+      subCb("private",     JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 3 }))
+      subCb("worker",      JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 4 }))
 
       expect(process.exit.callCount).toEqual(0)
 
 
 
+    it "should not kill worker if onKillCb is not fired", () =>
+      worker.onKill (cb) => # cb not called
+      subCb("kill:mocked-uuid", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 0 }))
+      expect(process.exit.callCount).toEqual(0)
+
+
+
+    it "should kill worker if onKillCb is fired", () =>
+      worker.onKill (cb) => cb()
+      subCb("kill:mocked-uuid", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 0 }))
+      expect(process.exit.callCount).toEqual(1)
+
+
+
     it "should kill worker with exit code 0", () =>
-      subCb("kill:mocked-uuid", '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":0}')
+      subCb("kill:mocked-uuid", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 0 }))
       expect(process.exit).toHaveBeenCalledWith(0)
 
 
 
     it "should kill worker with exit code 1", () =>
-      subCb("kill:mocked-uuid", '{"meta":{"workerId":"mocked-uuid","group":"worker"},"data":1}')
+      subCb("kill:mocked-uuid", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 1 }))
       expect(process.exit).toHaveBeenCalledWith(1)
