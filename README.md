@@ -81,6 +81,8 @@ worker.onKill (cb) =>
 
 
 
+__onConfirmation__
+
 Worker are able to receive confirmations. To listen to a confirmation just do
 the following. As described, the callback is executed when the message
 "identifier" was received 2 times.
@@ -118,15 +120,6 @@ worker.emitGroup("group", "message")
 
 
 
-__emitConfirmation__
-
-To make a worker publish a confirmation message do.
-```coffeescript
-worker.emitConfirmation("message")
-```
-
-
-
 __emitKill__
 
 Each process is able to kill another. For that action you need to know the
@@ -137,6 +130,15 @@ children too. So be careful by sending a kill signal to the master process.
 That will terminate the whole cluster. To send an exit code to an worker do.
 ```coffeescript
 worker.emitKill("processId", 0)
+```
+
+
+
+__emitConfirmation__
+
+To make a worker publish a confirmation message do.
+```coffeescript
+worker.emitConfirmation("message")
 ```
 
 
