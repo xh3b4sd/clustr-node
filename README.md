@@ -185,9 +185,31 @@ confirmation messages should only be simple strings.
 
 
 
+### argv
+
+Command line argument parsing is realized using the `Optimist` library.
+Arguments by default are used by the given process. To bubble arguments through
+each process of the cluster, prefix command line options with `cluster-`. See
+the `examples` section, where `--cluster-verbose` is given to each spawned child
+process, to enable logging for the whole cluster. So, if you start the cluster
+just using `--verbose`, only the master is able to log.
+
+
+
+### logging
+
+By default the cluster do not log any information. To make the master log its
+own output, add `--verbose` to the execution command. To enable logging for the
+whole cluster, add `--cluster-verbose` to the execution command.
+
+
+
 ### examples
 
 For examples take a look into the `examples/` directory and play around.
+```coffeescript
+coffee examples/master.coffee --cluster-verbose
+```
 
 
 

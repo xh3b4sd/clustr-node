@@ -2,6 +2,7 @@ _            = require("underscore")
 Uuid         = require("node-uuid")
 Path         = require("path")
 Redis        = require("redis")
+Optimist     = require("optimist")
 ChildProcess = require("child_process")
 
 class exports.Worker
@@ -24,9 +25,11 @@ class exports.Worker
       successfulConfirmations: 0
 
     @processId    = @config.uuid?.v4()   or Uuid.v4()
-    @childProcess = @config.childProcess or ChildProcess
+    @logger       = @config.logger       or console.log
+    @optimist     = @config.optimist     or Optimist
     @publisher    = @config.publisher    or Redis.createClient()
     @subscriber   = @config.subscriber   or Redis.createClient()
+    @childProcess = @config.childProcess or ChildProcess
 
     @workerPids   = []
     @channels     = [
@@ -59,24 +62,29 @@ class exports.Worker
 
       @onKillCb () =>
         message = JSON.parse(payload)
-        # console.log("#{message.meta.group} kill #{@config.group} - pid: #{process.pid} - exit code: #{message.data}")
+        @log("#{message.meta.group} sent exit code #{message.data} to #{@config.group}")
         process.exit(message.data)
 
 
 
   setupKillChildren: () =>
-    # prevent event emitter memory leaking
+    # just bind once and prevent event emitter memory leaks
     return if process.listeners("exit").length is 1
 
     process.on "exit", (code) =>
+      @log("#{@config.group} killed #{@workerPids.length} children")
       process.kill(pid, "SIGTERM") for pid in @workerPids
-      # console.log "#{@config.group} and #{@workerPids.length} children killed"
 
 
 
   close: () =>
     @publisher.quit()
     @subscriber.quit()
+
+
+
+  log: (message) =>
+    @logger(message) if "verbose" of @optimist.argv or "cluster-verbose" of @optimist.argv
 
 
 
@@ -206,6 +214,8 @@ class exports.Worker
   ###
   prepareChildProcess: (workers, cb) =>
     _.each workers, (worker, id) =>
+      return @missingWorkerFileError() if not worker.file?
+
       [ command, filename ] = process.argv
       args = []
 
@@ -217,9 +227,12 @@ class exports.Worker
         args = [ "-c", worker.cpu, command ]
         command = "taskset"
 
-      # check worker file
-      return @missingWorkerFileError() if not worker.file?
       args.push(Path.resolve(filename, "../", worker.file))
+
+      # bubble options
+      for arg, val of @optimist.argv
+        continue if arg in [ "_", "$0", "coffee" ] or not /^cluster-/.test(arg)
+        if val is true then args.push("--#{arg}") else args.push("--#{arg}=#{val}")
 
       cb.call(@, command, args, worker.respawn)
 
@@ -227,25 +240,28 @@ class exports.Worker
 
   spawnChildProcess: (command, args, respawn) =>
     worker = @childProcess.spawn(command, args)
-    # console.log "spawned worker: command: #{command} #{args.join(" ")}"
+    @log("#{@config.group} spawned worker - command: #{command} #{args.join(" ")}")
 
     @workerPids.push(worker.pid)
     @stats.spawnChildProcess++
 
+    # bubble streams
     worker.stdout.on "data", (data) =>
-      console.log("stdout:", data.toString())
+      @log(data.toString().replace(/\n$/, ""))
 
     worker.stderr.on "data", (data) =>
-      console.log("stderr:", data.toString())
+      @log(data.toString().replace(/\n$/, ""))
 
     # respawn worker
     worker.on "exit", (code) =>
+      @log("#{@config.group} killed worker - command: #{command} #{args.join(" ")} - code: #{code} ")
+
       return if code is 0        # worker ends as expected
       return if respawn is false # worker shouldn`t respawn
 
       @spawnChildProcess(command, args, respawn)
       @stats.respawnChildProcess++
-      # console.log "respawn worker: code: #{code} command: #{command} #{args.join(" ")}"
+      @log("#{@config.group} respawned worker - command: #{command} #{args.join(" ")}")
 
 
 
