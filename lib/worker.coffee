@@ -232,12 +232,11 @@ class exports.Worker
 
       # merge own options
       for arg, val of worker.args
-        if val is true then args.push("--#{arg}") else args.push("--#{arg}=#{val}")
+        args.push(@formatCommandLineOption(val, arg))
 
       # bubble cluster options
-      for arg, val of @optimist.argv
-        continue if not /^cluster-/.test(arg) or val is false
-        if val is true then args.push("--#{arg}") else args.push("--#{arg}=#{val}")
+      for arg, val of @optimist.argv when /^cluster-/.test(arg) and val isnt false
+        args.push(@formatCommandLineOption(val, arg))
 
       cb.call(@, command, args, worker.respawn)
 
@@ -273,6 +272,11 @@ class exports.Worker
   #
   # private
   #
+
+
+
+  formatCommandLineOption: (val, arg) =>
+    if val is true then "--#{arg}" else "--#{arg}=#{val}"
 
 
 
