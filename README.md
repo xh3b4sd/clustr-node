@@ -154,15 +154,16 @@ optional:
 - `cpu` set cpu affinity using the `taskset` command, which only works under unix systems.
 - `command` defines the command that executes `file`. By default `file` will be executed using the parents execution command.
 - `respawn` by default is set to `true`. To prevent respawning a worker set `respawn` to `false`.
+- `args` an object of command line args that will be given to a process.
 
 To make a worker spawn workers, do something like that.
 ```coffeescript
 worker.spawn [
-  { file: "./web_worker.coffee",   cpu: 0                          }
-  { file: "./web_worker.coffee",   cpu: 1                          }
-  { file: "./cache_worker.coffee", cpu: 2,          respawn: false }
-  { file: "./cache_worker.coffee", cpu: 3,          respawn: false }
-  { file: "./bashscript",          command: "bash"                 }
+  { file: "./web_worker.coffee",   cpu: 0 }
+  { file: "./web_worker.coffee",   cpu: 1, args: { "cluster-option": "foo", private: "option" } }
+  { file: "./cache_worker.coffee", cpu: 2, respawn: false }
+  { file: "./cache_worker.coffee", cpu: 3, respawn: false }
+  { file: "./bashscript", command: "bash" }
 ]
 ```
 
@@ -191,7 +192,9 @@ Arguments by default are used by the given process. To bubble arguments through
 each process of the cluster, prefix command line options with `cluster-`. See
 the `examples` section, where `--cluster-verbose` is given to each spawned child
 process, to enable logging for the whole cluster. So, if you start the cluster
-just using `--verbose`, only the master is able to log.
+just using `--verbose`, only the master is able to log. Also, if you set a
+cluster option to a spawned worker definition using the `args` property, each
+children of that worker will receive that option too.
 
 
 

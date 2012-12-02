@@ -227,9 +227,14 @@ class exports.Worker
         args = [ "-c", worker.cpu, command ]
         command = "taskset"
 
+      # set executed file
       args.push(Path.resolve(filename, "../", worker.file))
 
-      # bubble options
+      # merge own options
+      for arg, val of worker.args
+        if val is true then args.push("--#{arg}") else args.push("--#{arg}=#{val}")
+
+      # bubble cluster options
       for arg, val of @optimist.argv
         continue if arg in [ "_", "$0", "coffee" ] or not /^cluster-/.test(arg)
         if val is true then args.push("--#{arg}") else args.push("--#{arg}=#{val}")
