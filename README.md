@@ -25,7 +25,7 @@ Clustr = require("clustr-node")
 
 
 
-### worker
+### create
 
 Create a worker process.
 ```coffeescript
@@ -34,7 +34,7 @@ worker = Clustr.Worker.create
 ```
 
 
-__onPublic__
+### onPublic
 
 Public messages are send to each living process. To make a worker listen to
 messages from the `public` channel do.
@@ -45,7 +45,7 @@ worker.onPublic (message) =>
 
 
 
-__onPrivate__
+### onPrivate
 
 Private messages are for a specific worker only that is identified by its
 `processId` property. To make a worker listen to private messages do.
@@ -56,7 +56,7 @@ worker.onPrivate (message) =>
 
 
 
-__onGroup__
+### onGroup
 
 Group messages are for a specific group only that is defined by its `group`
 property. To make a worker listen to group messages do.
@@ -67,7 +67,7 @@ worker.onGroup (message) =>
 
 
 
-__onKill__
+### onKill
 
 Before a worker dies, it is possible to do something before. Here it is
 necessary to execute the `cb` given to the `onKill` method. If the callback is
@@ -81,7 +81,7 @@ worker.onKill (cb) =>
 
 
 
-__onConfirmation__
+### onConfirmation
 
 Worker are able to receive confirmations. To listen to a confirmation just do
 the following. As described, the callback is executed when the message
@@ -93,7 +93,7 @@ worker.onConfirmation 2, "identifier", () =>
 
 
 
-__emitPublic__
+### emitPublic
 
 To make a worker publish a public message do.
 ```coffeescript
@@ -102,7 +102,7 @@ worker.emitPublic("message")
 
 
 
-__emitPrivate__
+### emitPrivate
 
 To make a worker publish a private message do.
 ```coffeescript
@@ -111,7 +111,7 @@ worker.emitPrivate("processId", "message")
 
 
 
-__emitGroup__
+### emitGroup
 
 To make a worker publish a group message do.
 ```coffeescript
@@ -120,7 +120,7 @@ worker.emitGroup("group", "message")
 
 
 
-__emitKill__
+### emitKill
 
 Each process is able to kill another. For that action you need to know the
 unique `processId` of the worker you want to kill. `processId` here is __not__
@@ -134,7 +134,7 @@ worker.emitKill("processId", 0)
 
 
 
-__emitConfirmation__
+### emitConfirmation
 
 To make a worker publish a confirmation message do.
 ```coffeescript
@@ -143,7 +143,7 @@ worker.emitConfirmation("message")
 
 
 
-__spawn__
+### spawn
 
 Each process is able to spawn workers.
 
@@ -170,7 +170,10 @@ worker.spawn [
 
 ### messages
 
-If a process receives a message it looks something like that.
+If a process receives a message it looks something like that. Each meta item
+should be a string. The data you send can be whatever is stringifyable. So you
+will be able to receive what you send. Note that confirmation messages should
+only be simple strings.
 ```coffeescript
 message =
   meta:
@@ -178,10 +181,6 @@ message =
     group:     GROUP
   data:        YOUR_MESSAGE
 ```
-
-Each meta item should be a string. The data you send can be whatever is
-stringifyable. So you will be able to receive what you send. Note that
-confirmation messages should only be simple strings.
 
 
 
