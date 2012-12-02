@@ -9,15 +9,16 @@ describe "spawning", () =>
   beforeEach () =>
     worker = Clustr.Worker.create
       group:        "worker"
+      optimist:     Mock.optimist()
       publisher:    Mock.pub()
       subscriber:   Mock.sub()
       childProcess: Mock.chiPro()
 
     worker.spawn [
-      { file: "./web_worker.js"                                                  }
-      { file: "./web_worker.js",       cpu: 1                                    }
-      { file: "./cache_worker.coffee",         command: "coffee", respawn: false }
-      { file: "./cache_worker.coffee", cpu: 2, command: "coffee"                 }
+      { file: "./web_worker.js", args: { "cluster-option5": true, "private-option5": "option" } }
+      { file: "./web_worker.js", cpu: 1 }
+      { file: "./cache_worker.coffee", command: "coffee", respawn: false }
+      { file: "./cache_worker.coffee", cpu: 2, command: "coffee" }
     ]
 
     [ callOne, callTwo, callThree, callFour, callFive, callSix ] = worker.childProcess.spawn.argsForCall
@@ -29,6 +30,11 @@ describe "spawning", () =>
       "node"
       [
         Path.resolve(process.argv[1], "../", "./web_worker.js")
+        "--cluster-option5"
+        "--private-option5=option"
+        "--cluster-option1=cluster-command-line-option"
+        "--cluster-option2"
+        "--cluster-option4=5"
       ]
     ]
 
@@ -42,6 +48,9 @@ describe "spawning", () =>
         1
         "node"
         Path.resolve(process.argv[1], "../", "./web_worker.js")
+        "--cluster-option1=cluster-command-line-option"
+        "--cluster-option2"
+        "--cluster-option4=5"
       ]
     ]
 
@@ -52,6 +61,9 @@ describe "spawning", () =>
       "coffee"
       [
         Path.resolve(process.argv[1], "../", "./cache_worker.coffee")
+        "--cluster-option1=cluster-command-line-option"
+        "--cluster-option2"
+        "--cluster-option4=5"
       ]
     ]
 
@@ -65,6 +77,9 @@ describe "spawning", () =>
         2
         "coffee"
         Path.resolve(process.argv[1], "../", "./cache_worker.coffee")
+        "--cluster-option1=cluster-command-line-option"
+        "--cluster-option2"
+        "--cluster-option4=5"
       ]
     ]
 

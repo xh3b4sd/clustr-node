@@ -236,7 +236,7 @@ class exports.Worker
 
       # bubble cluster options
       for arg, val of @optimist.argv
-        continue if arg in [ "_", "$0", "coffee" ] or not /^cluster-/.test(arg)
+        continue if not /^cluster-/.test(arg) or val is false
         if val is true then args.push("--#{arg}") else args.push("--#{arg}=#{val}")
 
       cb.call(@, command, args, worker.respawn)
