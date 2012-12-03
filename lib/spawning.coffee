@@ -2,7 +2,7 @@ _    = require("underscore")
 Path = require("path")
 
 class exports.Spawning
-  @formatCommandLineOption: (val, arg) =>
+  @formatCommandLineOption: (arg, val) =>
     if val is true then "--#{arg}" else "--#{arg}=#{val}"
 
 
@@ -44,11 +44,12 @@ class exports.Spawning
 
       # merge own options
       for arg, val of worker.args
-        args.push(Spawning.formatCommandLineOption(val, arg))
+        args.push(Spawning.formatCommandLineOption(arg, val))
 
       # bubble cluster options
+      args.push("--cluster-master-process-id=#{@processId}") if @config.group is "master"
       for arg, val of @optimist.argv when /^cluster-/.test(arg) and val isnt false
-        args.push(Spawning.formatCommandLineOption(val, arg))
+        args.push(Spawning.formatCommandLineOption(arg, val))
 
       cb.call(@, command, args, worker.respawn)
 

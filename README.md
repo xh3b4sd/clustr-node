@@ -8,7 +8,7 @@
 
 ## install
 
-```
+```bash
 npm install clustr-node
 ```
 
@@ -32,6 +32,15 @@ Create a worker process.
 worker = Clustr.Worker.create
   group: "worker"
 ```
+
+
+
+### groups
+
+Worker can be in every possible group you can imagine. There is just one
+special group. The `master` group. Also there may should be only one worker
+in the `master` group.
+
 
 
 ### onPublic
@@ -169,6 +178,16 @@ worker.spawn [
 
 
 
+### masterProcessId
+
+The master process id is available for each worker. It will be bubbled through
+the cluster. So all workers are always able to talk with the master like that.
+```coffeescript
+worker.emitPrivate(worker.masterProcessId, "message")
+```
+
+
+
 ### messages
 
 If a process receives a message it looks something like that. Each meta item
@@ -218,6 +237,6 @@ coffee examples/master.coffee --cluster-verbose
 ### tests
 
 Tests are located in `spec/` directory. To run it just do.
-```
+```bash
 npm test
 ```

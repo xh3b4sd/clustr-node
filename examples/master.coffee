@@ -33,12 +33,11 @@ master.spawn [
   { file: "./bashscript", command: "bash" }
 ]
 
-console.log ""
-console.log "master stats:"
-console.log master.stats
+# console.log "master stats:"
+# console.log master.stats
 
-setTimeout () =>
-  console.log ""
-  console.log "master stats:"
-  console.log master.stats
-, 2000
+# setTimeout () =>
+#   console.log ""
+#   console.log "master stats:"
+#   console.log master.stats
+# , 2000
