@@ -1,4 +1,8 @@
 module.exports =
+  logger: jasmine.createSpy
+
+
+
   optimist: (custom) =>
     object =
       argv:
@@ -15,6 +19,8 @@ module.exports =
 
     object.argv[key] = val for key, val of custom when custom?
     object
+
+
 
   uuid: () =>
     v4: jasmine.createSpy().andReturn("mocked-uuid")

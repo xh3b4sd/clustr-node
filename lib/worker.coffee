@@ -37,12 +37,12 @@ class exports.Worker extends Mixin(Emitter, Listener, Spawning)
       receivedConfirmations:   0
       successfulConfirmations: 0
 
-    @processId       = @config.uuid?.v4()   or Uuid.v4()
     @logger          = @config.logger       or console.log
     @optimist        = @config.optimist     or Optimist
     @publisher       = @config.publisher    or Redis.createClient()
     @subscriber      = @config.subscriber   or Redis.createClient()
     @childProcess    = @config.childProcess or ChildProcess
+    @processId       = @config.uuid?.v4()   or Uuid.v4()
     @masterProcessId = @optimist.argv?["cluster-master-process-id"]
 
     @workerPids   = []
@@ -87,4 +87,4 @@ class exports.Worker extends Mixin(Emitter, Listener, Spawning)
 
 
   log: (message) =>
-    @logger(message) if "verbose" of @optimist.argv or "cluster-verbose" of @optimist.argv
+    @logger(message) if @optimist.argv["verbose"] is true or @optimist.argv["cluster-verbose"] is true
