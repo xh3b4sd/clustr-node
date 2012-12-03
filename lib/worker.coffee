@@ -85,17 +85,5 @@ class exports.Worker extends Mixin(Emitter, Listener, Spawning)
 
 
 
-  close: () =>
-    @publisher.quit()
-    @subscriber.quit()
-
-
-
   log: (message) =>
     @logger(message) if "verbose" of @optimist.argv or "cluster-verbose" of @optimist.argv
-
-
-
-  #
-  # private
-  #

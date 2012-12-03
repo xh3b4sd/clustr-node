@@ -17,20 +17,18 @@ module.exports =
 
 
 
-  pub: () =>
+  publisher: () =>
     publish: jasmine.createSpy()
-    quit:    jasmine.createSpy()
 
 
 
-  sub: () =>
+  subscriber: () =>
     on:        jasmine.createSpy()
     subscribe: jasmine.createSpy()
-    quit:      jasmine.createSpy()
 
 
 
-  chiPro: () =>
+  childProcess: () =>
     spawn: jasmine.createSpy().andReturn
       stdout:
         on: jasmine.createSpy()

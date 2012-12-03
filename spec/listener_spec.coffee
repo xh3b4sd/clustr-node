@@ -16,9 +16,9 @@ describe "listener", () =>
     worker = Clustr.Worker.create
       group:        "worker"
       uuid:         Mock.uuid()
-      publisher:    Mock.pub()
-      subscriber:   Mock.sub()
-      childProcess: Mock.chiPro()
+      publisher:    Mock.publisher()
+      subscriber:   Mock.subscriber()
+      childProcess: Mock.childProcess()
 
 
 

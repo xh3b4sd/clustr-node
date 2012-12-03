@@ -10,9 +10,9 @@ describe "spawning", () =>
     worker = Clustr.Worker.create
       group:        "worker"
       optimist:     Mock.optimist()
-      publisher:    Mock.pub()
-      subscriber:   Mock.sub()
-      childProcess: Mock.chiPro()
+      publisher:    Mock.publisher()
+      subscriber:   Mock.subscriber()
+      childProcess: Mock.childProcess()
 
     worker.spawn [
       { file: "./web_worker.js", args: { "cluster-option5": true, "private-option5": "option" } }
