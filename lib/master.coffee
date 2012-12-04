@@ -11,14 +11,14 @@ class exports.Master extends Process
     @config.group = "master"
 
     @setup()
-    @setupOnExit()
+    @setupTermination()
     @setupOnRegistration()
     @setupOnDeregistration()
     @setupMasterSubscriptions()
 
 
 
-  setupOnExit: () =>
+  setupTermination: () =>
     # just bind once and prevent event emitter memory leaks
     return if process.listeners("exit").length is 1
 
@@ -33,9 +33,10 @@ class exports.Master extends Process
 
 
 
+  ###
+  # Master registers workers if they start
+  ###
   setupOnRegistration: () =>
-    return if @config.group isnt "master"
-
     @subscriber.on "message", (channel, payload) =>
       return if channel isnt @channels.registration(@masterPid)
 
@@ -45,13 +46,20 @@ class exports.Master extends Process
 
 
 
+  ###
+  # Master deregisters workers if they exit.
+  ###
   setupOnDeregistration: () =>
     @subscriber.on "message", (channel, payload) =>
       return if channel isnt @channels.deregistration(@masterPid)
 
       message = JSON.parse(payload)
+      return if not @clusterInfo[message.meta.group]?
+
       for pid, index in @clusterInfo[message.meta.group] when pid is message.meta.pid
-        @clusterInfo[message.meta.group].splice(index, 1)
+        pid = @clusterInfo[message.meta.group].splice(index, 1)
+
+      @log("master deregistered worker pid #{pid}")
 
 
 

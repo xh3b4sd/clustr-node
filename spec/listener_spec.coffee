@@ -89,7 +89,7 @@ describe "listener", () =>
 
         it "should receive correct messages", () =>
           subCb("private:#{process.pid}", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
-          expect(cb).toHaveBeenCalledWith(            { meta: { processId: "processId", group: "worker" }, data: expectedMessage })
+          expect(cb).toHaveBeenCalledWith(               { meta: { processId: "processId", group: "worker" }, data: expectedMessage })
 
 
 
@@ -171,7 +171,6 @@ describe "listener", () =>
 
       it "should execute callback on 'confirmation' channel", () =>
         subCb("confirmation", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: identifier }))
-
         expect(cb.callCount).toEqual(1)
 
 

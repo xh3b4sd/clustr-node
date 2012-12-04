@@ -73,6 +73,13 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning)
 
 
 
+  close: () =>
+    process.removeAllListeners()
+    @publisher.quit()
+    @subscriber.quit()
+
+
+
   prepareOutgogingPayload: (pid, group, data) =>
     meta:
       pid:   pid

@@ -29,12 +29,14 @@ module.exports =
 
   publisher: () =>
     publish: jasmine.createSpy()
+    quit:    jasmine.createSpy()
 
 
 
   subscriber: () =>
     on:        jasmine.createSpy()
     subscribe: jasmine.createSpy()
+    quit:      jasmine.createSpy()
 
 
 
