@@ -108,10 +108,11 @@ worker.onKill (cb) =>
 
 Worker are able to receive confirmations. To listen to a confirmation just do
 the following. As described, the callback is executed when the message
-"identifier" was received 2 times.
+"identifier" was received 2 times. Also, `messages` provided by the callback
+contains meta data of all confirmed workers.
 ```coffeescript
-worker.onConfirmation 2, "identifier", () =>
-  # do something when message "identifier" was received 2 times
+worker.onConfirmation 2, "identifier", (messages) =>
+  # do something when messages "identifier" was received 2 times
 ```
 
 
