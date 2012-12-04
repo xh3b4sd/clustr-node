@@ -30,7 +30,7 @@ class exports.Listener
 
 
   onConfirmation: (requiredMessages, identifier, cb) =>
-    received = 0
+    received = []
     @subscriber.on "message", (channel, payload) =>
       @stats.onMessage++
 
@@ -38,12 +38,13 @@ class exports.Listener
       return if channel      isnt @channels.confirmation()
       return if message.data isnt identifier
 
+      received.push(message)
       @stats.receivedConfirmations++
 
-      return if ++received < requiredMessages
+      return if received.length < requiredMessages
 
-      received = 0
-      cb(message)
+      cb(received)
+      received = []
       @stats.successfulConfirmations++
 
 

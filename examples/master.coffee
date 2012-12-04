@@ -14,14 +14,14 @@ Clustr = require("../index")
 master = Clustr.Master.create()
 
 # master executes callback if "webWorker" was received 2 times
-master.onConfirmation 2, "webWorker", (message) =>
+master.onConfirmation 2, "webWorker", (messages) =>
   # master kills the last confirmed worker
-  master.emitKill(message.meta.pid, exitCode = 1)
+  master.emitKill(messages[1].meta.pid, exitCode = 1)
 
 # master executes callback if "cacheWorker" was received 2 times
-master.onConfirmation 2, "cacheWorker", (message) =>
+master.onConfirmation 2, "cacheWorker", (messages) =>
   # master kills the last confirmed worker
-  master.emitKill(message.meta.pid, exitCode = 1)
+  master.emitKill(messages[1].meta.pid, exitCode = 1)
 
 # master spawns worker
 master.spawn [

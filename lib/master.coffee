@@ -29,7 +29,7 @@ class exports.Master extends Process
       pids = _.flatten(_.toArray(@clusterInfo))
       @emitKill(pid, code ) for pid in pids when pid isnt @pid
 
-      @log("cluster dies with #{pids.length} processes")
+      @log("cluster died with #{pids.length} processes")
 
 
 
