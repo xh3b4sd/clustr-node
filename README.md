@@ -15,7 +15,7 @@
 - each worker is able to kill workers
 - each worker has a stats object containing event statistics
 - each worker knows the `pid` of the master process
-- cluster dies when master receives SIGHUP (exit code 1)
+- cluster dies when master receives `SIGHUP` (exit code 1)
 - cluster dies when master receives signal from `emitKill`
 
 
@@ -220,23 +220,21 @@ message =
 
 ### stats
 
-Each worker has a stats object containing event statistics.
-```coffeescript
-@stats =
-  emitPublic:              0
-  emitPrivate:             0
-  emitGroup:               0
-  emitKill:                0
-  emitConfirmation:        0
-  onMessage:               0
-  onPublic:                0
-  onGroup:                 0
-  onPrivate:               0
-  spawnChildProcess:       0
-  respawnChildProcess:     0
-  receivedConfirmations:   0
-  successfulConfirmations: 0
-```
+Each worker has a stats object containing event statistics with the following
+properties.
+- `emitPublic`
+- `emitPrivate`
+- `emitGroup`
+- `emitKill`
+- `emitConfirmation`
+- `onMessage`
+- `onPublic`
+- `onGroup`
+- `onPrivate`
+- `spawnChildProcess`
+- `respawnChildProcess`
+- `receivedConfirmations`
+- `successfulConfirmations`
 
 
 
