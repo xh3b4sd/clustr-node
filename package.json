@@ -1,6 +1,6 @@
 {
   "name": "clustr-node",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "CoffeeScript cluster module to manage multi process cluster in NodeJs. Clustr is responseable for worker spawning and messaging between all processes.",
   "author": "Tim Schindler",
   "keywords": ["multi", "process", "cluster", "coffeescript", "nodejs"],
