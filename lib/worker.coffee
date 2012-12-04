@@ -45,7 +45,7 @@ class exports.Worker extends Mixin(Emitter, Listener, Spawning)
     @processId       = @config.uuid?.v4()   or Uuid.v4()
     @masterProcessId = @optimist.argv?["cluster-master-process-id"]
 
-    @workerPids   = []
+    @workers   = []
     @channels     = [
       "confirmation"
       "public"
@@ -55,8 +55,8 @@ class exports.Worker extends Mixin(Emitter, Listener, Spawning)
     ]
 
     @setupSubscriptions()
-    @setupKill()
-    @setupKillChildren()
+    @setupKillListener()
+    @setupProcessExit()
 
 
 
@@ -65,24 +65,27 @@ class exports.Worker extends Mixin(Emitter, Listener, Spawning)
 
 
 
-  setupKill: () =>
+  setupKillListener: () =>
     @subscriber.on "message", (channel, payload) =>
       return if channel isnt "kill:#{@processId}"
 
       @onKillCb () =>
         message = JSON.parse(payload)
         @log("#{message.meta.group} sent exit code #{message.data} to #{@config.group}")
+
+        # kill own process
         process.exit(message.data)
 
 
 
-  setupKillChildren: () =>
+  setupProcessExit: () =>
     # just bind once and prevent event emitter memory leaks
     return if process.listeners("exit").length is 1
 
     process.on "exit", (code) =>
-      @log("#{@config.group} killed #{@workerPids.length} children")
-      process.kill(pid, "SIGTERM") for pid in @workerPids
+      # kill child processes
+      worker.kill() for worker in @workers
+      @log("#{@config.group} killed #{@workers.length} children")
 
 
 

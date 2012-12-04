@@ -59,7 +59,7 @@ class exports.Spawning
     worker = @childProcess.spawn(command, args)
     @log("#{@config.group} spawned worker - command: #{command} #{args.join(" ")}")
 
-    @workerPids.push(worker.pid)
+    @workers.push(worker)
     @stats.spawnChildProcess++
 
     # bubble streams
