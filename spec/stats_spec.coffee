@@ -209,7 +209,7 @@ describe "stats", () =>
 
 
       it "should also count each private message event", () =>
-        subCb("private:mocked-uuid", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: "message" }))
+        subCb("private:#{process.pid}", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: "message" }))
         expect(worker.stats).toEqual
           emitPublic:              0
           emitPrivate:             0
@@ -256,7 +256,7 @@ describe "stats", () =>
 
 
 
-      it "should also count each private message event", () =>
+      it "should also count each group message event", () =>
         subCb("group:worker", JSON.stringify({ meta: { workerId: "workerId", group: "worker" }, data: "message" }))
         expect(worker.stats).toEqual
           emitPublic:              0

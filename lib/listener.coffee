@@ -2,7 +2,7 @@ class exports.Listener
   onPublic: (cb) =>
     @subscriber.on "message", (channel, payload) =>
       @stats.onMessage++
-      return if channel isnt "public"
+      return if channel isnt @channels.public()
 
       cb(JSON.parse(payload))
       @stats.onPublic++
@@ -12,7 +12,7 @@ class exports.Listener
   onPrivate: (cb) =>
     @subscriber.on "message", (channel, payload) =>
       @stats.onMessage++
-      return if channel isnt "private:#{@processId}"
+      return if channel isnt @channels.private(@pid)
 
       cb(JSON.parse(payload))
       @stats.onPrivate++
@@ -22,7 +22,7 @@ class exports.Listener
   onGroup: (cb) =>
     @subscriber.on "message", (channel, payload) =>
       @stats.onMessage++
-      return if channel isnt "group:#{@config.group}"
+      return if channel isnt @channels.group(@config.group)
 
       cb(JSON.parse(payload))
       @stats.onGroup++
@@ -35,7 +35,7 @@ class exports.Listener
       @stats.onMessage++
 
       message = JSON.parse(payload)
-      return if channel      isnt "confirmation"
+      return if channel      isnt @channels.confirmation()
       return if message.data isnt identifier
 
       @stats.receivedConfirmations++

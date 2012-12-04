@@ -6,9 +6,17 @@
 
 
 
-## design
+## facts
 
-flat hierarchy
+- each worker register to the cluster on process start
+- each worker deregister from the cluster on process end
+- each worker is able to spawn new processes
+- each worker is able to talk with each cluster member
+- each worker is able to kill workers
+- each worker has a stats object containing event statistics
+- each worker knows the `pid` of the master process
+- cluster dies when master receives SIGHUP (exit code 1)
+- cluster dies when master receives signal from `emitKill`
 
 
 
@@ -63,7 +71,7 @@ worker.onPublic (message) =>
 ### onPrivate
 
 Private messages are for a specific worker only that is identified by its
-`processId` property. To make a worker listen to private messages do.
+`pid` property. To make a worker listen to private messages do.
 ```coffeescript
 worker.onPrivate (message) =>
   # do something with private message when it was received
@@ -121,7 +129,7 @@ worker.emitPublic("message")
 
 To make a worker publish a private message do.
 ```coffeescript
-worker.emitPrivate("processId", "message")
+worker.emitPrivate("pid", "message")
 ```
 
 
@@ -138,13 +146,13 @@ worker.emitGroup("group", "message")
 ### emitKill
 
 Each process is able to kill another. For that action you need to know the
-unique `processId` of the worker you want to kill. `processId` here is __not__
+unique `pid` of the worker you want to kill. `pid` here __is__
 the systems `pid`. Each valid `exitCode`, a process respects, can be send
 (0, 1, etc.). `exitCode` defaults to 0. Killing a worker will terminate its
 children too. So be careful by sending a kill signal to the master process.
 That will terminate the whole cluster. To send an exit code to an worker do.
 ```coffeescript
-worker.emitKill("processId", 0)
+worker.emitKill("pid", 0)
 ```
 
 
@@ -184,12 +192,12 @@ worker.spawn [
 
 
 
-### masterProcessId
+### masterPid
 
 The master process id is available for each worker. It will be bubbled through
 the cluster. So all workers are always able to talk with the master like that.
 ```coffeescript
-worker.emitPrivate(worker.masterProcessId, "message")
+worker.emitPrivate(worker.masterPid, "message")
 ```
 
 
@@ -203,9 +211,31 @@ only be simple strings.
 ```coffeescript
 message =
   meta:
-    processId: PROCESS_ID
-    group:     GROUP
-  data:        YOUR_MESSAGE
+    pid:   PROCESS_ID
+    group: GROUP
+  data:    YOUR_MESSAGE
+```
+
+
+
+### stats
+
+Each worker has a stats object containing event statistics.
+```coffeescript
+@stats =
+  emitPublic:              0
+  emitPrivate:             0
+  emitGroup:               0
+  emitKill:                0
+  emitConfirmation:        0
+  onMessage:               0
+  onPublic:                0
+  onGroup:                 0
+  onPrivate:               0
+  spawnChildProcess:       0
+  respawnChildProcess:     0
+  receivedConfirmations:   0
+  successfulConfirmations: 0
 ```
 
 

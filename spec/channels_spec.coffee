@@ -6,34 +6,48 @@ Clustr  = require("../index")
 describe "channels", () =>
   [ worker, channels ] = []
 
-  beforeEach () =>
-    worker = Clustr.Worker.create
-      group:        "worker"
-      uuid:         Mock.uuid()
-      publisher:    Mock.publisher()
-      subscriber:   Mock.subscriber()
-      childProcess: Mock.childProcess()
+  describe "master", () =>
+    beforeEach () =>
+      worker = Clustr.Master.create
+        group:        "master"
+        publisher:    Mock.publisher()
+        subscriber:   Mock.subscriber()
+        childProcess: Mock.childProcess()
 
-    channels = _.flatten(worker.subscriber.subscribe.argsForCall)
-
-
-
-  it "should provide list of channels", () =>
-    expect(worker.channels).toEqual [
-      "confirmation"
-      "public"
-      "private:mocked-uuid"
-      "group:worker"
-      "kill:mocked-uuid"
-    ]
+      channels = _.flatten(worker.subscriber.subscribe.argsForCall)
 
 
 
-  it "should subscribe to channels", () =>
-    expect(channels).toEqual [
-      "confirmation"
-      "public"
-      "private:mocked-uuid"
-      "group:worker"
-      "kill:mocked-uuid"
-    ]
+    it "should subscribe to correct channels", () =>
+      expect(channels).toEqual [
+        "confirmation"
+        "public"
+        "private:#{process.pid}"
+        "group:master"
+        "kill:#{process.pid}"
+        "registration:#{process.pid}"
+        "deregistration:#{process.pid}"
+      ]
+
+
+
+  describe "worker", () =>
+    beforeEach () =>
+      worker = Clustr.Worker.create
+        group:        "worker"
+        publisher:    Mock.publisher()
+        subscriber:   Mock.subscriber()
+        childProcess: Mock.childProcess()
+
+      channels = _.flatten(worker.subscriber.subscribe.argsForCall)
+
+
+
+    it "should subscribe to correct channels", () =>
+      expect(channels).toEqual [
+        "confirmation"
+        "public"
+        "private:#{process.pid}"
+        "group:worker"
+        "kill:#{process.pid}"
+      ]

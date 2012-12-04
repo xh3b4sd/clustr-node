@@ -29,7 +29,8 @@ describe "emitter", () =>
 
         beforeEach () =>
           worker.emitPublic(expectedMessage)
-          [ [ channel, message ] ] = worker.publisher.publish.argsForCall
+          # first call is for cluster registration
+          [ [], [ channel, message ] ] = worker.publisher.publish.argsForCall
 
 
 
@@ -41,7 +42,7 @@ describe "emitter", () =>
         it "should publish correct message", () =>
           expect(message).toEqual JSON.stringify
             meta:
-              processId: "mocked-uuid"
+              pid:       process.pid
               group:     "worker"
             data:        expectedMessage
 
@@ -54,7 +55,8 @@ describe "emitter", () =>
 
         beforeEach () =>
           worker.emitPrivate("processId", expectedMessage)
-          [ [ channel, message ] ] = worker.publisher.publish.argsForCall
+          # first call is for cluster registration
+          [ [], [ channel, message ] ] = worker.publisher.publish.argsForCall
 
 
 
@@ -66,7 +68,7 @@ describe "emitter", () =>
         it "should publish correct message", () =>
           expect(message).toEqual JSON.stringify
             meta:
-              processId: "mocked-uuid"
+              pid:       process.pid
               group:     "worker"
             data:        expectedMessage
 
@@ -79,7 +81,8 @@ describe "emitter", () =>
 
         beforeEach () =>
           worker.emitGroup("group", expectedMessage)
-          [ [ channel, message ] ] = worker.publisher.publish.argsForCall
+          # first call is for cluster registration
+          [ [], [ channel, message ] ] = worker.publisher.publish.argsForCall
 
 
 
@@ -91,7 +94,7 @@ describe "emitter", () =>
         it "should publish correct message", () =>
           expect(message).toEqual JSON.stringify
             meta:
-              processId: "mocked-uuid"
+              pid:       process.pid
               group:     "worker"
             data:        expectedMessage
 
@@ -101,7 +104,8 @@ describe "emitter", () =>
     it "should publish on kill channel", () =>
       worker.emitKill("processId")
 
-      [ [ channel, message ] ] = worker.publisher.publish.argsForCall
+      # first call is for cluster registration
+      [ [], [ channel, message ] ] = worker.publisher.publish.argsForCall
       expect(channel).toEqual("kill:processId")
 
 
@@ -109,16 +113,18 @@ describe "emitter", () =>
     it "should publish default exit code 0", () =>
       worker.emitKill("processId")
 
-      [ [ channel, message ] ] = worker.publisher.publish.argsForCall
-      expect(message).toEqual('{"meta":{"processId":"mocked-uuid","group":"worker"},"data":0}')
+      # first call is for cluster registration
+      [ [], [ channel, message ] ] = worker.publisher.publish.argsForCall
+      expect(message).toEqual(JSON.stringify({ meta: { pid: process.pid, group: "worker" }, data: 0 }))
 
 
 
     it "should publish given exit code", () =>
       worker.emitKill("processId", 1)
 
-      [ [ channel, message ] ] = worker.publisher.publish.argsForCall
-      expect(message).toEqual('{"meta":{"processId":"mocked-uuid","group":"worker"},"data":1}')
+      # first call is for cluster registration
+      [ [], [ channel, message ] ] = worker.publisher.publish.argsForCall
+      expect(message).toEqual(JSON.stringify({ meta: { pid: process.pid, group: "worker" }, data: 1 }))
 
 
 
@@ -127,7 +133,8 @@ describe "emitter", () =>
 
     beforeEach () =>
       worker.emitConfirmation("identifier")
-      [ [ channel, message ] ] = worker.publisher.publish.argsForCall
+      # first call is for cluster registration
+      [ [], [ channel, message ] ] = worker.publisher.publish.argsForCall
 
 
 
@@ -137,4 +144,4 @@ describe "emitter", () =>
 
 
     it "should publish correct message", () =>
-      expect(message).toEqual('{"meta":{"processId":"mocked-uuid","group":"worker"},"data":"identifier"}')
+      expect(message).toEqual(JSON.stringify({ meta: { pid: process.pid, group: "worker" }, data: "identifier" }))

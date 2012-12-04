@@ -29,12 +29,12 @@ describe "spawning", () =>
     it "should provide 'masterProcessId' worker", () =>
       worker = Clustr.Worker.create
         group:        "worker"
-        optimist:     Mock.optimist({ "cluster-master-process-id": "masterProcessId" })
+        optimist:     Mock.optimist({ "cluster-master-pid": "masterPid" })
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
         childProcess: Mock.childProcess()
 
-      expect(worker.masterProcessId).toEqual("masterProcessId")
+      expect(worker.masterPid).toEqual("masterPid")
 
 
 
@@ -191,7 +191,6 @@ describe "spawning", () =>
     beforeEach () =>
       worker = Clustr.Worker.create
         group:        "master"
-        uuid:         Mock.uuid()
         optimist:     Mock.optimist()
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
@@ -220,7 +219,7 @@ describe "spawning", () =>
           Path.resolve(process.argv[1], "../", "./web_worker.js")
           "--cluster-option5"
           "--private-option5=option"
-          "--cluster-master-process-id=mocked-uuid"
+          "--cluster-master-pid=#{process.pid}"
           "--cluster-option1=cluster-command-line-option"
           "--cluster-option2"
           "--cluster-option4=5"
@@ -237,7 +236,7 @@ describe "spawning", () =>
           1
           "node"
           Path.resolve(process.argv[1], "../", "./web_worker.js")
-          "--cluster-master-process-id=mocked-uuid"
+          "--cluster-master-pid=#{process.pid}"
           "--cluster-option1=cluster-command-line-option"
           "--cluster-option2"
           "--cluster-option4=5"
@@ -251,7 +250,7 @@ describe "spawning", () =>
         "coffee"
         [
           Path.resolve(process.argv[1], "../", "./cache_worker.coffee")
-          "--cluster-master-process-id=mocked-uuid"
+          "--cluster-master-pid=#{process.pid}"
           "--cluster-option1=cluster-command-line-option"
           "--cluster-option2"
           "--cluster-option4=5"
@@ -268,7 +267,7 @@ describe "spawning", () =>
           2
           "coffee"
           Path.resolve(process.argv[1], "../", "./cache_worker.coffee")
-          "--cluster-master-process-id=mocked-uuid"
+          "--cluster-master-pid=#{process.pid}"
           "--cluster-option1=cluster-command-line-option"
           "--cluster-option2"
           "--cluster-option4=5"

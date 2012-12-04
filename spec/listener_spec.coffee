@@ -82,13 +82,13 @@ describe "listener", () =>
 
 
         it "should receive 1 messages", () =>
-          subCb("private:mocked-uuid", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
+          subCb("private:#{process.pid}", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
           expect(cb.callCount).toEqual(1)
 
 
 
         it "should receive correct messages", () =>
-          subCb("private:mocked-uuid", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
+          subCb("private:#{process.pid}", JSON.stringify({ meta: { processId: "processId", group: "worker" }, data: expectedMessage }))
           expect(cb).toHaveBeenCalledWith(            { meta: { processId: "processId", group: "worker" }, data: expectedMessage })
 
 
@@ -365,7 +365,7 @@ describe "listener", () =>
 
 
     it "should kill worker on kill channel", () =>
-      subCb("kill:mocked-uuid", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 0 }))
+      subCb("kill:#{process.pid}", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 0 }))
       expect(process.exit.callCount).toEqual(1)
 
 
@@ -383,24 +383,24 @@ describe "listener", () =>
 
     it "should not kill worker if onKillCb is not fired", () =>
       worker.onKill (cb) => # cb not called
-      subCb("kill:mocked-uuid", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 0 }))
+      subCb("kill:#{process.pid}", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 0 }))
       expect(process.exit.callCount).toEqual(0)
 
 
 
     it "should kill worker if onKillCb is fired", () =>
       worker.onKill (cb) => cb()
-      subCb("kill:mocked-uuid", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 0 }))
+      subCb("kill:#{process.pid}", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 0 }))
       expect(process.exit.callCount).toEqual(1)
 
 
 
     it "should kill worker with exit code 0", () =>
-      subCb("kill:mocked-uuid", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 0 }))
+      subCb("kill:#{process.pid}", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 0 }))
       expect(process.exit).toHaveBeenCalledWith(0)
 
 
 
     it "should kill worker with exit code 1", () =>
-      subCb("kill:mocked-uuid", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 1 }))
+      subCb("kill:#{process.pid}", JSON.stringify({ meta: { processId: "mocked-uuid", group: "worker" }, data: 1 }))
       expect(process.exit).toHaveBeenCalledWith(1)

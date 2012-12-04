@@ -2,8 +2,41 @@ _    = require("underscore")
 Path = require("path")
 
 class exports.Spawning
-  @formatCommandLineOption: (arg, val) =>
+  @formatOption: (arg, val) =>
     if val is true then "--#{arg}" else "--#{arg}=#{val}"
+
+
+
+  @setWorkerCommand: (worker) =>
+    return worker.command if worker.command?
+    process.argv[0]
+
+
+
+  @setCpuAffinity: (worker, args) =>
+    return [] if not worker.cpu?
+    [ "taskset", "-c", worker.cpu, args.shift() ]
+
+
+
+  @setExecutionFile: (worker) =>
+    Path.resolve(process.argv[1], "../", worker.file)
+
+
+
+  @setWorkerOptions: (worker) =>
+    (@formatOption(arg, val) for arg, val of worker.args)
+
+
+
+  @setClusterMasterPid: (pid, group) =>
+    return [] if group isnt "master"
+    "--cluster-master-pid=#{pid}"
+
+
+
+  @setClusterOptions: (argv) =>
+    (@formatOption(arg, val) for arg, val of argv when /^cluster-/.test(arg) and val isnt false)
 
 
 
@@ -28,30 +61,16 @@ class exports.Spawning
     _.each workers, (worker, id) =>
       return Spawning.missingWorkerFileError() if not worker.file?
 
-      [ command, filename ] = process.argv
       args = []
+      args.push(Spawning.setWorkerCommand(worker))
+      args.push(Spawning.setCpuAffinity(worker, args))
+      args.push(Spawning.setExecutionFile(worker))
+      args.push(Spawning.setWorkerOptions(worker))
+      args.push(Spawning.setClusterMasterPid(@pid, @config.group))
+      args.push(Spawning.setClusterOptions(@optimist.argv))
+      args = _.flatten(args)
 
-      # change worker command
-      command = worker.command if worker.command?
-
-      # set cpu affinity
-      if "cpu" of worker
-        args = [ "-c", worker.cpu, command ]
-        command = "taskset"
-
-      # set executed file
-      args.push(Path.resolve(filename, "../", worker.file))
-
-      # merge own options
-      for arg, val of worker.args
-        args.push(Spawning.formatCommandLineOption(arg, val))
-
-      # bubble cluster options
-      args.push("--cluster-master-process-id=#{@processId}") if @config.group is "master"
-      for arg, val of @optimist.argv when /^cluster-/.test(arg) and val isnt false
-        args.push(Spawning.formatCommandLineOption(arg, val))
-
-      cb.call(@, command, args, worker.respawn)
+      cb.call(@, args.shift(), args, worker.respawn)
 
 
 
@@ -59,7 +78,6 @@ class exports.Spawning
     worker = @childProcess.spawn(command, args)
     @log("#{@config.group} spawned worker - command: #{command} #{args.join(" ")}")
 
-    @workers.push(worker)
     @stats.spawnChildProcess++
 
     # bubble streams

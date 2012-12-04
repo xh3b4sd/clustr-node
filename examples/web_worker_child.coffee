@@ -20,3 +20,7 @@ webWorkerChild.onGroup (message) =>
 
 # webWorkerChild receives a private message
 webWorkerChild.onPrivate (message) =>
+
+setTimeout () =>
+  webWorkerChild.emitKill(webWorkerChild.masterPid, 0)
+, 5000
