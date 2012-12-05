@@ -1,3 +1,5 @@
+ChildProcess = require("child_process")
+
 module.exports =
   logger: jasmine.createSpy
 
@@ -42,9 +44,15 @@ module.exports =
 
 
   childProcess: () =>
-    spawn: jasmine.createSpy().andReturn
+    spyOn(ChildProcess, "spawn").andReturn
       stdout:
         on: jasmine.createSpy()
       stderr:
         on: jasmine.createSpy()
       on: jasmine.createSpy()
+
+
+
+  process: () =>
+    spyOn(process, "on")
+    spyOn(process, "exit")

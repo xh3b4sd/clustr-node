@@ -8,13 +8,11 @@ describe "cluster", () =>
 
   describe "master", () =>
     beforeEach () =>
-      spyOn(process, "on")
-      spyOn(process, "exit")
+      Mock.process()
 
       worker = Clustr.Master.create
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
-        childProcess: Mock.childProcess()
 
 
 

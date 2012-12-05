@@ -1,6 +1,5 @@
 Redis        = require("redis")
 Optimist     = require("optimist")
-ChildProcess = require("child_process")
 
 Mixin        = require("./mixin").Mixin
 Channels     = require("./channels").Channels
@@ -15,10 +14,6 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning)
 
 
   optimist: Optimist
-
-
-
-  childProcess: ChildProcess
 
 
 
@@ -40,7 +35,6 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning)
 
     @pid          = process.pid
     @optimist     = @config.optimist     if @config.optimist?
-    @childProcess = @config.childProcess if @config.childProcess?
     @logger       = @config.logger       or console.log
     @publisher    = @config.publisher    or Redis.createClient()
     @subscriber   = @config.subscriber   or Redis.createClient()

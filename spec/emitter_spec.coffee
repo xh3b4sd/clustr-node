@@ -18,7 +18,6 @@ describe "emitter", () =>
       uuid:         Mock.uuid()
       publisher:    Mock.publisher()
       subscriber:   Mock.subscriber()
-      childProcess: Mock.childProcess()
 
 
 

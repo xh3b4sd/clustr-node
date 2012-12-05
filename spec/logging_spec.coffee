@@ -15,7 +15,6 @@ describe "logging", () =>
         optimist:     Mock.optimist({ "verbose": true })
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
-        childProcess: Mock.childProcess()
 
       worker.log("test message")
       expect(console.log).toHaveBeenCalledWith("test message")
@@ -29,7 +28,6 @@ describe "logging", () =>
         optimist:     Mock.optimist({ "verbose": true })
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
-        childProcess: Mock.childProcess()
 
       worker.log("test message")
       expect(worker.logger).toHaveBeenCalledWith("test message")
@@ -45,7 +43,6 @@ describe "logging", () =>
         optimist:     Mock.optimist({ "cluster-verbose": true })
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
-        childProcess: Mock.childProcess()
 
       worker.log("test message")
       expect(console.log).toHaveBeenCalledWith("test message")
@@ -59,7 +56,6 @@ describe "logging", () =>
         optimist:     Mock.optimist({ "cluster-verbose": true })
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
-        childProcess: Mock.childProcess()
 
       worker.log("test message")
       expect(worker.logger).toHaveBeenCalledWith("test message")

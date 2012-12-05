@@ -2,17 +2,19 @@ _       = require("underscore")
 Jasmine = require("jasmine-node")
 Mock    = require("./lib/mock")
 Clustr  = require("../index")
+ChildProcess = require("child_process")
 
 describe "stats", () =>
   [ worker, channels ] = []
 
   beforeEach () =>
+    Mock.childProcess()
+
     worker = Clustr.Worker.create
       group:        "worker"
       uuid:         Mock.uuid()
       publisher:    Mock.publisher()
       subscriber:   Mock.subscriber()
-      childProcess: Mock.childProcess()
 
 
 
@@ -370,7 +372,7 @@ describe "stats", () =>
 
       beforeEach () =>
         worker.spawn([ file: "./web_worker.js" ])
-        workerChild = worker.childProcess.spawn()
+        workerChild = ChildProcess.spawn()
         [ [ eventName, exitCb ] ] = workerChild.on.argsForCall
 
 

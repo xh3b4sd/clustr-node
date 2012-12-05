@@ -1,5 +1,6 @@
 _    = require("underscore")
 Path = require("path")
+ChildProcess = require("child_process")
 
 class exports.Spawning
   @formatOption: (arg, val) =>
@@ -75,7 +76,7 @@ class exports.Spawning
 
 
   spawnChildProcess: (command, args, respawn) =>
-    worker = @childProcess.spawn(command, args)
+    worker = ChildProcess.spawn(command, args)
     @log("#{@config.group} spawned worker - command: #{command} #{args.join(" ")}")
 
     @stats.spawnChildProcess++

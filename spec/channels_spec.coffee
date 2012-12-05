@@ -12,7 +12,6 @@ describe "channels", () =>
         group:        "master"
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
-        childProcess: Mock.childProcess()
 
       channels = _.flatten(worker.subscriber.subscribe.argsForCall)
 

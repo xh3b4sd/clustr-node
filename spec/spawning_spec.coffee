@@ -2,37 +2,41 @@ Path    = require("path")
 Jasmine = require("jasmine-node")
 Mock    = require("./lib/mock")
 Clustr  = require("../index")
+ChildProcess = require("child_process")
 
 describe "spawning", () =>
   [ worker, callOne, callTwo, callThree, callFour, callFive ] = []
 
   beforeEach () =>
-    worker = Clustr.Worker.create
-      group:        "worker"
-      optimist:     Mock.optimist()
-      publisher:    Mock.publisher()
-      subscriber:   Mock.subscriber()
-      childProcess: Mock.childProcess()
-
-    worker.spawn [
-      { file: "./web_worker.js", args: { "cluster-option5": true, "private-option5": "option" } }
-      { file: "./web_worker.js", cpu: 1 }
-      { file: "./cache_worker.coffee", command: "coffee", respawn: false }
-      { file: "./cache_worker.coffee", cpu: 2, command: "coffee" }
-    ]
-
-    [ callOne, callTwo, callThree, callFour, callFive, callSix ] = worker.childProcess.spawn.argsForCall
+    Mock.childProcess()
 
 
 
   describe "worker", () =>
-    it "should provide 'masterProcessId' worker", () =>
+    beforeEach () =>
+      worker = Clustr.Worker.create
+        group:        "worker"
+        optimist:     Mock.optimist()
+        publisher:    Mock.publisher()
+        subscriber:   Mock.subscriber()
+
+      worker.spawn [
+        { file: "./web_worker.js", args: { "cluster-option5": true, "private-option5": "option" } }
+        { file: "./web_worker.js", cpu: 1 }
+        { file: "./cache_worker.coffee", command: "coffee", respawn: false }
+        { file: "./cache_worker.coffee", cpu: 2, command: "coffee" }
+      ]
+
+      [ callOne, callTwo, callThree, callFour, callFive, callSix ] = ChildProcess.spawn.argsForCall
+
+
+
+    it "should provide 'masterProcessId'", () =>
       worker = Clustr.Worker.create
         group:        "worker"
         optimist:     Mock.optimist({ "cluster-master-pid": "masterPid" })
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
-        childProcess: Mock.childProcess()
 
       expect(worker.masterPid).toEqual("masterPid")
 
@@ -103,87 +107,87 @@ describe "spawning", () =>
 
 
 
-  describe "respawning enabled by default", () =>
-    [ workerChild, eventNameTwo, eventCbTwo ] = []
+    describe "respawning enabled by default", () =>
+      [ workerChild, eventNameTwo, eventCbTwo ] = []
 
-    beforeEach () =>
-      # cause 5. spawn()
-      workerChild = worker.childProcess.spawn()
-      [ [], [ eventNameTwo, eventCbTwo ] ] = workerChild.on.argsForCall
-
-
-
-    describe "exit code 0", () =>
-      it "should use correct event name", () =>
-        expect(eventNameTwo).toEqual("exit")
+      beforeEach () =>
+        # cause 5. spawn()
+        workerChild = ChildProcess.spawn()
+        [ [], [ eventNameTwo, eventCbTwo ] ] = workerChild.on.argsForCall
 
 
 
-      it "should not respawn worker", () =>
-        # send exit code 0 to 2. worker and cause 6. spawn()
-        eventCbTwo(0)
-        [ [], [], [], [], [], argsSixth ] = worker.childProcess.spawn.argsForCall
-
-        # 6. spawn() should not cause respawning of 2. worker
-        expect(argsSixth).toBeUndefined()
+      describe "exit code 0", () =>
+        it "should use correct event name", () =>
+          expect(eventNameTwo).toEqual("exit")
 
 
 
-    describe "exit code 1", () =>
-      it "should use correct event name", () =>
-        expect(eventNameTwo).toEqual("exit")
+        it "should not respawn worker", () =>
+          # send exit code 0 to 2. worker and cause 6. spawn()
+          eventCbTwo(0)
+          [ [], [], [], [], [], argsSixth ] = ChildProcess.spawn.argsForCall
+
+          # 6. spawn() should not cause respawning of 2. worker
+          expect(argsSixth).toBeUndefined()
 
 
 
-      it "should respawn worker", () =>
-        # send exit code 1 to 2. worker and cause 6. spawn()
-        eventCbTwo(1)
-        [ [], argsTwo, [], [], [], argsSixth ] = worker.childProcess.spawn.argsForCall
-
-        # 6. spawn() should cause respawning of 2. worker
-        expect(argsTwo).toEqual(argsSixth)
+      describe "exit code 1", () =>
+        it "should use correct event name", () =>
+          expect(eventNameTwo).toEqual("exit")
 
 
 
-  describe "respawning disabled", () =>
-    [ workerChild, eventNameTwo, eventCbTwo ] = []
+        it "should respawn worker", () =>
+          # send exit code 1 to 2. worker and cause 6. spawn()
+          eventCbTwo(1)
+          [ [], argsTwo, [], [], [], argsSixth ] = ChildProcess.spawn.argsForCall
 
-    beforeEach () =>
-      # cause 5. spawn()
-      workerChild = worker.childProcess.spawn()
-      [ [], [], [ eventNameTwo, eventCbTwo ] ] = workerChild.on.argsForCall
-
-
-
-    describe "exit code 1", () =>
-      it "should use correct event name", () =>
-        expect(eventNameTwo).toEqual("exit")
+          # 6. spawn() should cause respawning of 2. worker
+          expect(argsTwo).toEqual(argsSixth)
 
 
 
-      it "should not respawn worker", () =>
-        # send exit code 0 to 3. worker and cause 6. spawn()
-        eventCbTwo(0)
-        [ [], [], [], [], [], argsSixth ] = worker.childProcess.spawn.argsForCall
+    describe "respawning disabled", () =>
+      [ workerChild, eventNameTwo, eventCbTwo ] = []
 
-        # 6. spawn() should not cause respawning of 3. worker
-        expect(argsSixth).toBeUndefined()
-
-
-
-    describe "exit code 9", () =>
-      it "should use correct event name", () =>
-        expect(eventNameTwo).toEqual("exit")
+      beforeEach () =>
+        # cause 5. spawn()
+        workerChild = ChildProcess.spawn()
+        [ [], [], [ eventNameTwo, eventCbTwo ] ] = workerChild.on.argsForCall
 
 
 
-      it "should not respawn worker", () =>
-        # send exit code 0 to 3. worker and cause 6. spawn()
-        eventCbTwo(9)
-        [ [], [], [], [], [], argsSixth ] = worker.childProcess.spawn.argsForCall
+      describe "exit code 1", () =>
+        it "should use correct event name", () =>
+          expect(eventNameTwo).toEqual("exit")
 
-        # 6. spawn() should not cause respawning of 3. worker
-        expect(argsSixth).toBeUndefined()
+
+
+        it "should not respawn worker", () =>
+          # send exit code 0 to 3. worker and cause 6. spawn()
+          eventCbTwo(0)
+          [ [], [], [], [], [], argsSixth ] = ChildProcess.spawn.argsForCall
+
+          # 6. spawn() should not cause respawning of 3. worker
+          expect(argsSixth).toBeUndefined()
+
+
+
+      describe "exit code 9", () =>
+        it "should use correct event name", () =>
+          expect(eventNameTwo).toEqual("exit")
+
+
+
+        it "should not respawn worker", () =>
+          # send exit code 0 to 3. worker and cause 6. spawn()
+          eventCbTwo(9)
+          [ [], [], [], [], [], argsSixth ] = ChildProcess.spawn.argsForCall
+
+          # 6. spawn() should not cause respawning of 3. worker
+          expect(argsSixth).toBeUndefined()
 
 
 
@@ -194,7 +198,6 @@ describe "spawning", () =>
         optimist:     Mock.optimist()
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
-        childProcess: Mock.childProcess()
 
       worker.spawn [
         { file: "./web_worker.js", args: { "cluster-option5": true, "private-option5": "option" } }
@@ -203,7 +206,7 @@ describe "spawning", () =>
         { file: "./cache_worker.coffee", cpu: 2, command: "coffee" }
       ]
 
-      [ callOne, callTwo, callThree, callFour, callFive, callSix ] = worker.childProcess.spawn.argsForCall
+      [ callOne, callTwo, callThree, callFour, callFive, callSix ] = ChildProcess.spawn.argsForCall
 
 
 
