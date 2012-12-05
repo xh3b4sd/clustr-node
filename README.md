@@ -17,7 +17,7 @@
 - each worker has a stats object containing event statistics of its own process
 - each worker knows the `pid` of the master process
 - cluster dies when master receives `SIGHUP` (exit code 1)
-- cluster dies when master receives signal from `emitKill`
+- cluster dies when master receives signal from [emitKill](https://github.com/zyndiecate/clustr-node#emitkill)
 
 
 
