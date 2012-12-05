@@ -279,14 +279,16 @@ clusterInfo =
 
 ### argv
 
-Command line argument parsing is realized using the `Optimist` library.
-Arguments by default are used by the given process. To bubble arguments through
-each process of the cluster, prefix command line options with `cluster-`. See
-the `examples` section, where `--cluster-verbose` is given to each spawned child
-process, to enable logging for the whole cluster. So, if you start the cluster
-just using `--verbose`, only the master is able to log. Also, if you set a
-cluster option to a spawned worker definition using the `args` property, each
-children of that worker will receive that option too.
+Command line argument parsing is realized using the
+[optimist](https://github.com/substack/node-optimist) library. Arguments by
+default are used by the given process. To bubble arguments through each process
+of the cluster, prefix command line options with `cluster-`. See the
+[examples](https://github.com/zyndiecate/clustr-node#examples) section, where
+`--cluster-verbose` is given to each spawned child process, to enable logging
+for the whole cluster. So, if you start the cluster just using `--verbose`,
+only the master is able to log. Also, if you set a cluster option to a spawned
+worker definition using the `args` property, each children of that worker will
+receive that option too.
 
 
 
