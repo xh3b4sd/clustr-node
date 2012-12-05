@@ -260,7 +260,8 @@ properties.
 
 ### clusterInfo
 
-The `clusterInfo` object could look something like that.
+The `clusterInfo` object could look something like that. It contains lists of
+cluster process ids grouped by the current cluster group names.
 ```coffeescript
 clusterInfo =
   webWorker:   [ 5182, 5184 ]
