@@ -44,7 +44,7 @@ Clustr = require("clustr-node")
 
 Create a master process.
 ```coffeescript
-master = Clustr.Master.create
+master = Clustr.Master.create()
 ```
 
 
@@ -59,7 +59,7 @@ worker = Clustr.Worker.create
 
 ### groups
 
-Worker can be in every possible group you can imagine. There is just one
+Workers can be in every possible group you can imagine. There is just one
 special group. The `master` group. Also there may should be only one worker
 in the `master` group.
 
@@ -178,10 +178,10 @@ worker.emitConfirmation("message")
 ### emitClusterInfo
 
 Workers are able to receive cluster infos like that. See also the
-[clusterInfo](https://github.com/zyndiecate/clustr-node#clusterInfo) section.
+[clusterInfo](https://github.com/zyndiecate/clustr-node#clusterinfo) section.
 ```coffeescript
 webWorkerChild.emitClusterInfo (message) =>
-  console.log message
+  # do something with cluster info when it was received
 ```
 
 
