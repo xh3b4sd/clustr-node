@@ -32,7 +32,7 @@ npm install clustr-node
 ## dependencies
 
 - `clustr` uses [pubsub](http://redis.io/topics/pubsub) for ipc, so you have to run a `redis` server on your machine.
-- `clustr` uses [taskset](http://www.unix.com/man-page/Linux/1/taskset/) for cpu affinity, so `cluster` should be used on `unix` systems.
+- `clustr` uses [taskset](http://www.unix.com/man-page/Linux/1/taskset/) for cpu affinity, so `clustr` should be used on `unix` systems.
 
 
 
