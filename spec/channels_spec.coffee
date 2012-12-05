@@ -8,10 +8,7 @@ describe "channels", () =>
 
   describe "master", () =>
     beforeEach () =>
-      Mock.optimist()
-
       worker = Clustr.Master.create
-        group:        "master"
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
 

@@ -13,8 +13,6 @@ describe "listener", () =>
     array:  [ "message", "array" ]
 
   beforeEach () =>
-    Mock.optimist()
-
     worker = Clustr.Worker.create
       group:        "worker"
       publisher:    Mock.publisher()

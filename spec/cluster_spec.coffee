@@ -8,7 +8,6 @@ describe "cluster", () =>
 
   describe "master", () =>
     beforeEach () =>
-      Mock.optimist()
       Mock.process()
 
       worker = Clustr.Master.create

@@ -8,7 +8,7 @@ describe "stats", () =>
   [ worker, channels ] = []
 
   beforeEach () =>
-    Mock.optimist()
+    Mock.optimist() # suppress logging
     Mock.childProcess()
 
     worker = Clustr.Worker.create
