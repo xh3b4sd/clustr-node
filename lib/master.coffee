@@ -10,8 +10,16 @@ class exports.Master extends Process
   constructor: (@config = {}) ->
     @config.group = "master"
 
+    ###
+    # @clusterInfo =
+    #   webWorker:   [ 5182, 5184 ]
+    #   cacheWorker: [ 5186, 5188 ]
+    ###
+    @clusterInfo  = {}
+
     @setup()
     @setupTermination()
+    @setupOnClusterInfo()
     @setupOnRegistration()
     @setupOnDeregistration()
     @setupMasterSubscriptions()
@@ -19,17 +27,22 @@ class exports.Master extends Process
 
 
   setupTermination: () =>
-    # just bind once and prevent event emitter memory leaks
-    return if process.listeners("exit").length is 1
-
     process.on "SIGHUP", () =>
       process.exit(1)
 
     process.on "exit", (code) =>
       pids = _.flatten(_.toArray(@clusterInfo))
       @emitKill(pid, code ) for pid in pids when pid isnt @pid
-
       @log("cluster died with #{pids.length} processes")
+
+
+
+  setupOnClusterInfo: () =>
+    @subscriber.on "message", (channel, payload) =>
+      return if channel isnt @channels.clusterInfo(@pid)
+
+      { meta: { pid } } = JSON.parse(payload)
+      @publisher.publish(@channels.clusterInfo(pid), @prepareOutgogingPayload(@clusterInfo))
 
 
 
@@ -38,11 +51,11 @@ class exports.Master extends Process
   ###
   setupOnRegistration: () =>
     @subscriber.on "message", (channel, payload) =>
-      return if channel isnt @channels.registration(@masterPid)
+      return if channel isnt @channels.registration(@pid)
 
-      message = JSON.parse(payload)
-      @clusterInfo[message.meta.group] = [] if not @clusterInfo[message.meta.group]?
-      @clusterInfo[message.meta.group].push(message.meta.pid)
+      { meta: { group, pid } } = JSON.parse(payload)
+      @clusterInfo[group] ?= []
+      @clusterInfo[group].push(pid)
 
 
 
@@ -51,18 +64,16 @@ class exports.Master extends Process
   ###
   setupOnDeregistration: () =>
     @subscriber.on "message", (channel, payload) =>
-      return if channel isnt @channels.deregistration(@masterPid)
+      return if channel isnt @channels.deregistration(@pid)
 
-      message = JSON.parse(payload)
-      return if not @clusterInfo[message.meta.group]?
+      { meta: { group, pid } } = JSON.parse(payload)
+      return if not @clusterInfo[group]?
 
-      for pid, index in @clusterInfo[message.meta.group] when pid is message.meta.pid
-        pid = @clusterInfo[message.meta.group].splice(index, 1)
-
+      pid = @clusterInfo[group].splice(index, 1) for ppid, index in @clusterInfo[group] when ppid is pid
       @log("master deregistered worker pid #{pid}")
 
 
 
   setupMasterSubscriptions: () =>
-    @subscriber.subscribe(@channels.registration(@masterPid))
-    @subscriber.subscribe(@channels.deregistration(@masterPid))
+    @subscriber.subscribe(@channels.registration(@pid))
+    @subscriber.subscribe(@channels.deregistration(@pid))

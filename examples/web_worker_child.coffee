@@ -21,6 +21,10 @@ webWorkerChild.onGroup (message) =>
 # webWorkerChild receives a private message
 webWorkerChild.onPrivate (message) =>
 
+webWorkerChild.emitClusterInfo (message) =>
+  console.log "webWorkerChild received clusterInfo:"
+  console.log message
+
 setTimeout () =>
   webWorkerChild.emitKill(webWorkerChild.masterPid, 0)
 , 5000

@@ -10,16 +10,27 @@ class exports.Worker extends Process
     return Worker.missingGroupNameError() if not @config.group?
 
     @setup()
+    @masterPid = @optimist.argv["cluster-master-pid"]
     @setupEmitRegistration()
 
 
 
   setupEmitRegistration: () =>
-    payload = @prepareOutgogingPayload(@pid, @config.group, "registration")
-    @publisher.publish(@channels.registration(@masterPid), JSON.stringify(payload))
+    @publisher.publish(@channels.registration(@masterPid), @prepareOutgogingPayload("registration"))
 
 
 
   emitDeregistration: () =>
-    payload = @prepareOutgogingPayload(@pid, @config.group, "deregistration")
-    @publisher.publish(@channels.deregistration(@masterPid), JSON.stringify(payload))
+    @publisher.publish(@channels.deregistration(@masterPid), @prepareOutgogingPayload("deregistration"))
+
+
+
+  emitClusterInfo: (cb) =>
+    messageCb = (channel, payload) =>
+      return if channel isnt @channels.clusterInfo(@pid)
+
+      @subscriber.removeListener("message", messageCb)
+      cb(JSON.parse(payload))
+
+    @subscriber.on("message", messageCb)
+    @publisher.publish(@channels.clusterInfo(@masterPid), @prepareOutgogingPayload("clusterInfo"))

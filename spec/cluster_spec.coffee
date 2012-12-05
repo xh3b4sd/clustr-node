@@ -17,14 +17,9 @@ describe "cluster", () =>
 
 
 
-  afterEach () =>
-    worker.close()
-
-
-
   describe "registration", () =>
     beforeEach () =>
-      [ [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
+      [ [], [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
 
 
 
@@ -70,7 +65,7 @@ describe "cluster", () =>
 
   describe "deregistration", () =>
     beforeEach () =>
-      [ [], [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
+      [ [], [], [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
 
       worker.clusterInfo =
         web:   [ "pid1", "pid2" ]

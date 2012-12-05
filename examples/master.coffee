@@ -32,11 +32,8 @@ master.spawn [
   { file: "./bashscript", command: "bash" }
 ]
 
-# console.log "master stats:"
-# console.log master.stats
-
 setTimeout () =>
   console.log ""
-  console.log "master clusterInfo:"
-  console.log master.clusterInfo
+  console.log "master shows stats:"
+  console.log master.stats
 , 3000

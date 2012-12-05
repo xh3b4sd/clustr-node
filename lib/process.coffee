@@ -30,20 +30,12 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning)
       receivedConfirmations:   0
       successfulConfirmations: 0
 
-    ###
-    # @clusterInfo =
-    #   webWorker:   [ 5182, 5184 ]
-    #   cacheWorker: [ 5186, 5188 ]
-    ###
-    @clusterInfo  = {}
-
     @logger       = @config.logger       or console.log
     @optimist     = @config.optimist     or Optimist
     @publisher    = @config.publisher    or Redis.createClient()
     @subscriber   = @config.subscriber   or Redis.createClient()
     @childProcess = @config.childProcess or ChildProcess
     @pid          = process.pid
-    @masterPid    = @optimist.argv["cluster-master-pid"] || @pid
 
     @setupProcessSubscriptions()
     @setupOnKill()
@@ -56,6 +48,7 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning)
     @subscriber.subscribe(@channels.private(@pid))
     @subscriber.subscribe(@channels.group(@config.group))
     @subscriber.subscribe(@channels.kill(@pid))
+    @subscriber.subscribe(@channels.clusterInfo(@pid))
 
 
 
@@ -64,12 +57,12 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning)
       return if channel isnt @channels.kill(@pid)
 
       @onKillCb () =>
-        message = JSON.parse(payload)
-        @log("#{message.meta.group} sent exit code #{message.data} to #{@config.group}")
+        { meta: { group }, data } = JSON.parse(payload)
+
+        @log("#{group} sent exit code #{data} to #{@config.group}")
         @emitDeregistration() if @config.group isnt "master"
 
-        # kill own process
-        process.exit(message.data)
+        process.exit(data)
 
 
 
@@ -80,11 +73,12 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning)
 
 
 
-  prepareOutgogingPayload: (pid, group, data) =>
-    meta:
-      pid:   pid
-      group: group
-    data:    data
+  prepareOutgogingPayload: (data) =>
+    JSON.stringify
+      meta:
+        pid:   @pid
+        group: @config.group
+      data:    data
 
 
 

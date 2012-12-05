@@ -30,3 +30,8 @@ class exports.Channels
 
     deregistration: (pid) =>
       "deregistration:#{pid}"
+
+
+
+    clusterInfo: (pid) =>
+      "clusterInfo:#{pid}"

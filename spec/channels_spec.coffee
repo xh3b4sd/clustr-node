@@ -25,6 +25,7 @@ describe "channels", () =>
         "private:#{process.pid}"
         "group:master"
         "kill:#{process.pid}"
+        "clusterInfo:#{process.pid}"
         "registration:#{process.pid}"
         "deregistration:#{process.pid}"
       ]
@@ -50,4 +51,5 @@ describe "channels", () =>
         "private:#{process.pid}"
         "group:worker"
         "kill:#{process.pid}"
+        "clusterInfo:#{process.pid}"
       ]

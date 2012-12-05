@@ -13,7 +13,8 @@
 - each worker is able to spawn new processes
 - each worker is able to talk with each cluster member
 - each worker is able to kill workers
-- each worker has a stats object containing event statistics
+- each worker is able to fetch cluster info
+- each worker has a stats object containing event statistics of its own process
 - each worker knows the `pid` of the master process
 - cluster dies when master receives `SIGHUP` (exit code 1)
 - cluster dies when master receives signal from `emitKill`
@@ -40,6 +41,13 @@ Clustr = require("clustr-node")
 
 
 ### create
+
+Create a master process.
+```coffeescript
+master = Clustr.Master.create
+```
+
+
 
 Create a worker process.
 ```coffeescript
@@ -167,6 +175,17 @@ worker.emitConfirmation("message")
 
 
 
+### emitClusterInfo
+
+Workers are able to receive cluster infos like that. See also the
+[clusterInfo](https://github.com/zyndiecate/clustr-node#clusterInfo) section.
+```coffeescript
+webWorkerChild.emitClusterInfo (message) =>
+  console.log message
+```
+
+
+
 ### spawn
 
 Each process is able to spawn workers.
@@ -236,6 +255,17 @@ properties.
 - `respawnChildProcess`
 - `receivedConfirmations`
 - `successfulConfirmations`
+
+
+
+### clusterInfo
+
+The `clusterInfo` object could look something like that.
+```coffeescript
+clusterInfo =
+  webWorker:   [ 5182, 5184 ]
+  cacheWorker: [ 5186, 5188 ]
+```
 
 
 
