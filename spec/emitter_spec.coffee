@@ -4,7 +4,7 @@ Mock    = require("./lib/mock")
 Clustr  = require("../index")
 
 describe "emitter", () =>
-  [ worker ] = []
+  [ worker, channel, message ] = []
 
   dataTypes =
     string: "message"
@@ -25,8 +25,6 @@ describe "emitter", () =>
   describe "public emitter", () =>
     _.each dataTypes, (expectedMessage, dataTypeTestCase) =>
       describe dataTypeTestCase, () =>
-        [ channel, message ] = []
-
         beforeEach () =>
           worker.emitPublic(expectedMessage)
           # first call is for cluster registration
@@ -51,8 +49,6 @@ describe "emitter", () =>
   describe "private emitter", () =>
     _.each dataTypes, (expectedMessage, dataTypeTestCase) =>
       describe dataTypeTestCase, () =>
-        [ channel, message ] = []
-
         beforeEach () =>
           worker.emitPrivate("processId", expectedMessage)
           # first call is for cluster registration
@@ -77,8 +73,6 @@ describe "emitter", () =>
   describe "group emitter", () =>
     _.each dataTypes, (expectedMessage, dataTypeTestCase) =>
       describe dataTypeTestCase, () =>
-        [ channel, message ] = []
-
         beforeEach () =>
           worker.emitGroup("group", expectedMessage)
           # first call is for cluster registration
@@ -129,8 +123,6 @@ describe "emitter", () =>
 
 
   describe "confirmation emitter", () =>
-    [ channel, message ] = []
-
     beforeEach () =>
       worker.emitConfirmation("identifier")
       # first call is for cluster registration

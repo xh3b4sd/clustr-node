@@ -4,7 +4,7 @@ Mock    = require("./lib/mock")
 Clustr  = require("../index")
 
 describe "listener", () =>
-  [ worker, requiredMessages, identifier, cb, subCb ] = []
+  [ worker, requiredMessages, identifier, cb, event, subCb ] = []
 
   dataTypes =
     string: "message"
@@ -25,14 +25,17 @@ describe "listener", () =>
   describe "public listener", () =>
     _.each dataTypes, (expectedMessage, dataTypeTestCase) =>
       describe dataTypeTestCase, () =>
-        [ cb, subCb ] = []
-
         beforeEach () =>
           cb = jasmine.createSpy()
 
           worker.onPublic(cb)
           # the first subscription is caused by the kill listener
-          [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
+          [ [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
+
+
+
+        it "should listen on 'message' events", () =>
+          expect(event).toEqual("message")
 
 
 
@@ -65,14 +68,17 @@ describe "listener", () =>
   describe "private listener", () =>
     _.each dataTypes, (expectedMessage, dataTypeTestCase) =>
       describe dataTypeTestCase, () =>
-        [ cb, subCb ] = []
-
         beforeEach () =>
           cb = jasmine.createSpy()
 
           worker.onPrivate(cb)
           # the first subscription is caused by the kill listener
-          [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
+          [ [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
+
+
+
+        it "should listen on 'message' events", () =>
+          expect(event).toEqual("message")
 
 
 
@@ -105,14 +111,17 @@ describe "listener", () =>
   describe "group listener", () =>
     _.each dataTypes, (expectedMessage, dataTypeTestCase) =>
       describe dataTypeTestCase, () =>
-        [ cb, subCb ] = []
-
         beforeEach () =>
           cb = jasmine.createSpy()
 
           worker.onGroup(cb)
           # the first subscription is caused by the kill listener
-          [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
+          [ [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
+
+
+
+        it "should listen on 'message' events", () =>
+          expect(event).toEqual("message")
 
 
 
@@ -151,7 +160,12 @@ describe "listener", () =>
 
         worker.onConfirmation(requiredMessages, identifier, cb)
         # the first subscription is caused by the kill listener
-        [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
+        [ [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
+
+
+
+      it "should listen on 'message' events", () =>
+        expect(event).toEqual("message")
 
 
 
@@ -183,7 +197,12 @@ describe "listener", () =>
 
         worker.onConfirmation(requiredMessages, identifier, cb)
         # the first subscription is caused by the kill listener
-        [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
+        [ [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
+
+
+
+      it "should listen on 'message' events", () =>
+        expect(event).toEqual("message")
 
 
 
@@ -215,7 +234,12 @@ describe "listener", () =>
 
         worker.onConfirmation(requiredMessages, identifier, cb)
         # the first subscription is caused by the kill listener
-        [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
+        [ [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
+
+
+
+      it "should listen on 'message' events", () =>
+        expect(event).toEqual("message")
 
 
 
@@ -253,7 +277,12 @@ describe "listener", () =>
         beforeEach () =>
           worker.onConfirmation(requiredMessages, identifier, cb)
           # the first subscription is caused by the kill listener
-          [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
+          [ [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
+
+
+
+        it "should listen on 'message' events", () =>
+          expect(event).toEqual("message")
 
 
 
@@ -291,7 +320,12 @@ describe "listener", () =>
 
         worker.onConfirmation(requiredMessages, identifier, cb)
         # the first subscription is caused by the kill listener
-        [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
+        [ [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
+
+
+
+      it "should listen on 'message' events", () =>
+        expect(event).toEqual("message")
 
 
 
@@ -340,7 +374,12 @@ describe "listener", () =>
         beforeEach () =>
           worker.onConfirmation(requiredMessages, identifier, cb)
           # the first subscription is caused by the kill listener
-          [ [], [ channel, subCb ] ] = worker.subscriber.on.argsForCall
+          [ [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
+
+
+
+        it "should listen on 'message' events", () =>
+          expect(event).toEqual("message")
 
 
 
@@ -377,13 +416,16 @@ describe "listener", () =>
 
 
   describe "kill listener", () =>
-    [ channel, subCb ] = []
-
     beforeEach () =>
       spyOn(process, "exit")
 
       # the first subscription is caused by the kill listener
-      [ [ channel, subCb ] ] = worker.subscriber.on.argsForCall
+      [ [ event, subCb ] ] = worker.subscriber.on.argsForCall
+
+
+
+    it "should listen on 'message' events", () =>
+      expect(event).toEqual("message")
 
 
 

@@ -4,7 +4,7 @@ Mock    = require("./lib/mock")
 Clustr  = require("../index")
 
 describe "cluster", () =>
-  [ worker, subCb, channel, message ] = []
+  [ worker, event, subCb, channel, message, cb ] = []
 
   describe "master", () =>
     beforeEach () =>
@@ -21,6 +21,11 @@ describe "cluster", () =>
     describe "registration", () =>
       beforeEach () =>
         [ [], [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
+
+
+
+      it "should listen on 'message' events", () =>
+        expect(event).toEqual("message")
 
 
 
@@ -66,9 +71,6 @@ describe "cluster", () =>
 
 
 
-
-
-
     describe "deregistration", () =>
       beforeEach () =>
         [ [], [], [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
@@ -76,6 +78,11 @@ describe "cluster", () =>
         worker.clusterInfo =
           web:   [ "pid1", "pid2" ]
           cache: [ "pid3", "pid4" ]
+
+
+
+      it "should listen on 'message' events", () =>
+        expect(event).toEqual("message")
 
 
 
@@ -173,6 +180,49 @@ describe "cluster", () =>
 
 
 
+    describe "cluster info", () =>
+      beforeEach () =>
+        worker.clusterInfo =
+          web:   [ "pid1", "pid2" ]
+          cache: [ "pid3", "pid4" ]
+
+        [ [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
+
+
+
+      it "should listen on 'message' events", () =>
+        expect(event).toEqual("message")
+
+
+
+      it "should send to correct worker that requested cluster info", () =>
+        subCb("clusterInfo:#{process.pid}", JSON.stringify({ meta: { pid: "pid", group: "worker" }, data: "clusterInfo" }))
+        [ [ channel, message ] ] = worker.publisher.publish.argsForCall
+
+        expect(channel).toEqual("clusterInfo:pid")
+
+
+
+      it "should send correct cluster info", () =>
+        subCb("clusterInfo:#{process.pid}", JSON.stringify({ meta: { pid: "pid", group: "worker" }, data: "clusterInfo" }))
+        [ [ channel, message ] ] = worker.publisher.publish.argsForCall
+
+        expect(message).toEqual JSON.stringify
+          meta: { pid: process.pid, group: "master" },
+          data: { web: [ "pid1", "pid2" ], cache: [ "pid3", "pid4" ] }
+
+
+
+      it "should not send on wrong channels", () =>
+        subCb("clusterInfo", JSON.stringify({ meta: { pid: "pid", group: "worker" }, data: "clusterInfo" }))
+        subCb(process.pid,   JSON.stringify({ meta: { pid: "pid", group: "worker" }, data: "clusterInfo" }))
+        subCb("public",      JSON.stringify({ meta: { pid: "pid", group: "worker" }, data: "clusterInfo" }))
+        subCb("private:foo", JSON.stringify({ meta: { pid: "pid", group: "worker" }, data: "clusterInfo" }))
+
+        expect(worker.publisher.publish.argsForCall).toEqual([])
+
+
+
   describe "worker", () =>
     beforeEach () =>
       worker = Clustr.Worker.create
@@ -211,6 +261,11 @@ describe "cluster", () =>
 
 
 
+      it "should listen on 'message' events", () =>
+        expect(event).toEqual("message")
+
+
+
       it "should deregister on exit on correct channel", () =>
         expect(channel).toEqual("deregistration:masterPid")
 
@@ -218,3 +273,83 @@ describe "cluster", () =>
 
       it "should deregister on exit with correct message", () =>
         expect(message).toEqual(JSON.stringify({ meta: { pid: process.pid, group: "worker" }, data: "deregistration" }))
+
+
+
+    describe "cluster info", () =>
+      describe "request", () =>
+        beforeEach () =>
+          worker.emitClusterInfo()
+          # first call is for cluster registration
+          [ [], [ channel, message ] ] = worker.publisher.publish.argsForCall
+
+
+
+        it "should publish to master", () =>
+          expect(channel).toEqual("clusterInfo:masterPid")
+
+
+
+        it "should publish correct data", () =>
+          expect(message).toEqual(JSON.stringify({ meta: { pid: process.pid, group: "worker" }, data: "clusterInfo" }))
+
+
+
+      describe "from master", () =>
+        beforeEach () =>
+          cb = jasmine.createSpy()
+
+          worker.emitClusterInfo(cb)
+          # first call is for onKill
+          [ [], [ event, subCb ] ] = worker.subscriber.on.argsForCall
+
+
+
+        it "should listen on 'message' events", () =>
+          expect(event).toEqual("message")
+
+
+
+        it "should provide cluster info data to given callback", () =>
+          subCb "clusterInfo:#{process.pid}", JSON.stringify
+            meta: { pid: process.pid, group: "master" },
+            data: { web: [ "pid1", "pid2" ], cache: [ "pid3", "pid4" ] }
+
+          [ [ clusterInfo ] ] = cb.argsForCall
+          expect(clusterInfo).toEqual
+            meta: { pid: process.pid, group: "master" },
+            data: { web: [ "pid1", "pid2" ], cache: [ "pid3", "pid4" ] }
+
+
+
+        it "should not fire callback on wrong channels", () =>
+          subCb "clusterInfo", JSON.stringify
+            meta: { pid: process.pid, group: "master" },
+            data: { web: [ "pid1", "pid2" ], cache: [ "pid3", "pid4" ] }
+
+          subCb process.pid, JSON.stringify
+            meta: { pid: process.pid, group: "master" },
+            data: { web: [ "pid1", "pid2" ], cache: [ "pid3", "pid4" ] }
+
+          subCb "infoo", JSON.stringify
+            meta: { pid: process.pid, group: "master" },
+            data: { web: [ "pid1", "pid2" ], cache: [ "pid3", "pid4" ] }
+
+          expect(cb).not.toHaveBeenCalled()
+
+
+
+        it "should deregister event listener when callback was fired", () =>
+          subCb "clusterInfo:#{process.pid}", JSON.stringify
+            meta: { pid: process.pid, group: "master" },
+            data: { web: [ "pid1", "pid2" ], cache: [ "pid3", "pid4" ] }
+
+          subCb "clusterInfo:#{process.pid}", JSON.stringify
+            meta: { pid: process.pid, group: "master" },
+            data: { web: [ "pid1", "pid2" ], cache: [ "pid3", "pid4" ] }
+
+          subCb "clusterInfo:#{process.pid}", JSON.stringify
+            meta: { pid: process.pid, group: "master" },
+            data: { web: [ "pid1", "pid2" ], cache: [ "pid3", "pid4" ] }
+
+          expect(worker.subscriber.on.callCount).toEqual(2)

@@ -34,9 +34,10 @@ module.exports =
 
 
   subscriber: () =>
-    on:        jasmine.createSpy()
-    subscribe: jasmine.createSpy()
-    quit:      jasmine.createSpy()
+    on:             jasmine.createSpy()
+    subscribe:      jasmine.createSpy()
+    quit:           jasmine.createSpy()
+    removeListener: jasmine.createSpy()
 
 
 
