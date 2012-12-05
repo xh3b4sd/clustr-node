@@ -13,10 +13,6 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning)
 
 
 
-  optimist: Optimist
-
-
-
   setup: () =>
     @stats =
       emitPublic:              0
@@ -33,11 +29,10 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning)
       receivedConfirmations:   0
       successfulConfirmations: 0
 
-    @pid          = process.pid
-    @optimist     = @config.optimist     if @config.optimist?
-    @logger       = @config.logger       or console.log
-    @publisher    = @config.publisher    or Redis.createClient()
-    @subscriber   = @config.subscriber   or Redis.createClient()
+    @pid        = process.pid
+    @logger     = @config.logger     or console.log
+    @publisher  = @config.publisher  or Redis.createClient()
+    @subscriber = @config.subscriber or Redis.createClient()
 
     @setupProcessSubscriptions()
     @setupOnKill()
@@ -85,4 +80,4 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning)
 
 
   log: (message) =>
-    @logger(message) if @optimist.argv["verbose"] is true or @optimist.argv["cluster-verbose"] is true
+    @logger(message) if Optimist.argv["verbose"] is true or Optimist.argv["cluster-verbose"] is true

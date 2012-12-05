@@ -1,5 +1,6 @@
-_    = require("underscore")
-Path = require("path")
+_            = require("underscore")
+Path         = require("path")
+Optimist     = require("optimist")
 ChildProcess = require("child_process")
 
 class exports.Spawning
@@ -68,7 +69,7 @@ class exports.Spawning
       args.push(Spawning.setExecutionFile(worker))
       args.push(Spawning.setWorkerOptions(worker))
       args.push(Spawning.setClusterMasterPid(@pid, @config.group))
-      args.push(Spawning.setClusterOptions(@optimist.argv))
+      args.push(Spawning.setClusterOptions(Optimist.argv))
       args = _.flatten(args)
 
       cb.call(@, args.shift(), args, worker.respawn)

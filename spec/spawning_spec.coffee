@@ -8,6 +8,7 @@ describe "spawning", () =>
   [ worker, callOne, callTwo, callThree, callFour, callFive ] = []
 
   beforeEach () =>
+    Mock.optimist()
     Mock.childProcess()
 
 
@@ -16,7 +17,6 @@ describe "spawning", () =>
     beforeEach () =>
       worker = Clustr.Worker.create
         group:        "worker"
-        optimist:     Mock.optimist()
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
 
@@ -32,9 +32,10 @@ describe "spawning", () =>
 
 
     it "should provide 'masterProcessId'", () =>
+      Mock.optimist({ "cluster-master-pid": "masterPid" })
+
       worker = Clustr.Worker.create
         group:        "worker"
-        optimist:     Mock.optimist({ "cluster-master-pid": "masterPid" })
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
 
@@ -195,7 +196,6 @@ describe "spawning", () =>
     beforeEach () =>
       worker = Clustr.Worker.create
         group:        "master"
-        optimist:     Mock.optimist()
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
 

@@ -13,9 +13,10 @@ describe "emitter", () =>
     array:  [ "message", "array" ]
 
   beforeEach () =>
+    Mock.optimist()
+
     worker = Clustr.Worker.create
       group:        "worker"
-      uuid:         Mock.uuid()
       publisher:    Mock.publisher()
       subscriber:   Mock.subscriber()
 

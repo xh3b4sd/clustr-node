@@ -8,6 +8,7 @@ describe "cluster", () =>
 
   describe "master", () =>
     beforeEach () =>
+      Mock.optimist()
       Mock.process()
 
       worker = Clustr.Master.create
@@ -223,12 +224,13 @@ describe "cluster", () =>
 
   describe "worker", () =>
     beforeEach () =>
+      Mock.childProcess()
+      Mock.optimist({ "cluster-master-pid": "masterPid" })
+
       worker = Clustr.Worker.create
         group:        "worker"
-        optimist:     Mock.optimist({ "cluster-master-pid": "masterPid" })
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
-        childProcess: Mock.childProcess()
 
 
 

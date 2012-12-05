@@ -1,3 +1,4 @@
+Optimist     = require("optimist")
 ChildProcess = require("child_process")
 
 module.exports =
@@ -6,8 +7,7 @@ module.exports =
 
 
   optimist: (custom) =>
-    object =
-      argv:
+    Optimist.argv =
         "_":               "foo"
         "$0":              "bar"
         "cluster-option1": "cluster-command-line-option"
@@ -19,13 +19,7 @@ module.exports =
         "private-option3": false
         "private-option4": 5
 
-    object.argv[key] = val for key, val of custom when custom?
-    object
-
-
-
-  uuid: () =>
-    v4: jasmine.createSpy().andReturn("mocked-uuid")
+    Optimist.argv[key] = val for key, val of custom when custom?
 
 
 

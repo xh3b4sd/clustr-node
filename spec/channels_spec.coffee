@@ -8,6 +8,8 @@ describe "channels", () =>
 
   describe "master", () =>
     beforeEach () =>
+      Mock.optimist()
+
       worker = Clustr.Master.create
         group:        "master"
         publisher:    Mock.publisher()
@@ -37,7 +39,6 @@ describe "channels", () =>
         group:        "worker"
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
-        childProcess: Mock.childProcess()
 
       channels = _.flatten(worker.subscriber.subscribe.argsForCall)
 

@@ -8,11 +8,11 @@ describe "stats", () =>
   [ worker, channels ] = []
 
   beforeEach () =>
+    Mock.optimist()
     Mock.childProcess()
 
     worker = Clustr.Worker.create
       group:        "worker"
-      uuid:         Mock.uuid()
       publisher:    Mock.publisher()
       subscriber:   Mock.subscriber()
 
