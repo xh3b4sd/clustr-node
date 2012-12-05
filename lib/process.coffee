@@ -14,6 +14,14 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning)
 
 
 
+  optimist: Optimist
+
+
+
+  childProcess: ChildProcess
+
+
+
   setup: () =>
     @stats =
       emitPublic:              0
@@ -30,12 +38,12 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning)
       receivedConfirmations:   0
       successfulConfirmations: 0
 
+    @pid          = process.pid
+    @optimist     = @config.optimist     if @config.optimist?
+    @childProcess = @config.childProcess if @config.childProcess?
     @logger       = @config.logger       or console.log
-    @optimist     = @config.optimist     or Optimist
     @publisher    = @config.publisher    or Redis.createClient()
     @subscriber   = @config.subscriber   or Redis.createClient()
-    @childProcess = @config.childProcess or ChildProcess
-    @pid          = process.pid
 
     @setupProcessSubscriptions()
     @setupOnKill()
