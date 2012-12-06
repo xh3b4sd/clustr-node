@@ -13,6 +13,8 @@ describe "listener", () =>
     array:  [ "message", "array" ]
 
   beforeEach () =>
+    Mock.process()
+
     worker = Clustr.Worker.create
       group:        "worker"
       publisher:    Mock.publisher()
@@ -415,8 +417,6 @@ describe "listener", () =>
 
   describe "kill listener", () =>
     beforeEach () =>
-      spyOn(process, "exit")
-
       # the first subscription is caused by the kill listener
       [ [ event, subCb ] ] = worker.subscriber.on.argsForCall
 
@@ -454,7 +454,7 @@ describe "listener", () =>
     it "should kill worker if onKillCb is fired", () =>
       worker.onKill (cb) => cb()
       subCb("kill:#{process.pid}", JSON.stringify({ meta: { pid: "mocked-uuid", group: "worker" }, data: 0 }))
-      expect(process.exit.callCount).toEqual(1)
+      expect(process.exit).toHaveBeenCalledWith(0)
 
 
 
@@ -467,3 +467,21 @@ describe "listener", () =>
     it "should kill worker with exit code 1", () =>
       subCb("kill:#{process.pid}", JSON.stringify({ meta: { pid: "mocked-uuid", group: "worker" }, data: 1 }))
       expect(process.exit).toHaveBeenCalledWith(1)
+
+
+
+    it "should close publisher connection on kill", () =>
+      subCb("kill:#{process.pid}", JSON.stringify({ meta: { pid: "mocked-uuid", group: "worker" }, data: 1 }))
+      expect(worker.publisher.quit).toHaveBeenCalled()
+
+
+
+    it "should close subscriber connection on kill", () =>
+      subCb("kill:#{process.pid}", JSON.stringify({ meta: { pid: "mocked-uuid", group: "worker" }, data: 1 }))
+      expect(worker.subscriber.quit).toHaveBeenCalled()
+
+
+
+    it "should remove all process listeners on kill", () =>
+      subCb("kill:#{process.pid}", JSON.stringify({ meta: { pid: "mocked-uuid", group: "worker" }, data: 1 }))
+      expect(process.removeAllListeners).toHaveBeenCalled()

@@ -219,6 +219,20 @@ worker.spawn [
 
 
 
+### close
+
+It is possible to close a worker using a given `exitCode`, that defaults to 1.
+Closing a worker means the following.
+- The worker will be deregistered from the cluster.
+- All connections will be closed.
+- All listeners will be removed.
+- The process exits with the given `exitCode` or 1.
+```coffeescript
+worker.close(1)
+```
+
+
+
 ### masterPid
 
 The master process id is available for each worker. It will be bubbled through

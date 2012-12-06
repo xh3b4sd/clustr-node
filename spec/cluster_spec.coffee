@@ -6,13 +6,43 @@ Clustr  = require("../index")
 describe "cluster", () =>
   [ worker, event, subCb, channel, message, cb ] = []
 
+
+
+  beforeEach () =>
+    Mock.process()
+
+
+
   describe "master", () =>
     beforeEach () =>
-      Mock.process()
-
       worker = Clustr.Master.create
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
+
+
+
+    describe "close", () =>
+      it "should close publisher connection", () =>
+        worker.close()
+        expect(worker.publisher.quit).toHaveBeenCalled()
+
+
+
+      it "should close subscriber connection", () =>
+        worker.close()
+        expect(worker.subscriber.quit).toHaveBeenCalled()
+
+
+
+      it "should remove all process listener", () =>
+        worker.close()
+        expect(process.removeAllListeners).toHaveBeenCalled()
+
+
+
+      it "should exit the process", () =>
+        worker.close()
+        expect(process.exit).toHaveBeenCalled()
 
 
 
@@ -233,6 +263,38 @@ describe "cluster", () =>
 
 
 
+    describe "close", () =>
+      it "should deregister worker", () =>
+        spyOn(worker, "emitDeregistration")
+        worker.close()
+        expect(worker.emitDeregistration).toHaveBeenCalled()
+
+
+
+      it "should close publisher connection", () =>
+        worker.close()
+        expect(worker.publisher.quit).toHaveBeenCalled()
+
+
+
+      it "should close subscriber connection", () =>
+        worker.close()
+        expect(worker.subscriber.quit).toHaveBeenCalled()
+
+
+
+      it "should remove all process listener", () =>
+        worker.close()
+        expect(process.removeAllListeners).toHaveBeenCalled()
+
+
+
+      it "should exit the process", () =>
+        worker.close()
+        expect(process.exit).toHaveBeenCalled()
+
+
+
     describe "registration", () =>
       beforeEach () =>
         [ [ channel, message ] ] = worker.publisher.publish.argsForCall
@@ -251,8 +313,6 @@ describe "cluster", () =>
 
     describe "deregistration", () =>
       beforeEach () =>
-        spyOn(process, "exit")
-
         [ [ event, subCb ] ] = worker.subscriber.on.argsForCall
         subCb("kill:#{process.pid}", JSON.stringify({ meta: { pid: "mocked-uuid", group: "worker" }, data: 0 }))
         # first call is for registration

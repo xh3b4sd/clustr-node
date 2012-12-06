@@ -57,16 +57,16 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning)
         { meta: { group }, data } = JSON.parse(payload)
 
         @log("#{group} sent exit code #{data} to #{@config.group}")
-        @emitDeregistration() if @config.group isnt "master"
-
-        process.exit(data)
+        @close(data)
 
 
 
-  close: () =>
-    process.removeAllListeners()
+  close: (code = 1) =>
+    @emitDeregistration() if @config.group isnt "master"
     @publisher.quit()
     @subscriber.quit()
+    process.removeAllListeners()
+    process.exit(code)
 
 
 

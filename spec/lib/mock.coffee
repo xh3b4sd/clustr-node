@@ -50,3 +50,4 @@ module.exports =
   process: () =>
     spyOn(process, "on")
     spyOn(process, "exit")
+    spyOn(process, "removeAllListeners")
