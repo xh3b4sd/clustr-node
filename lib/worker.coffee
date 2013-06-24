@@ -1,3 +1,4 @@
+_             = require("underscore")
 Optimist      = require("optimist")
 Mixin         = require("./mixin").Mixin
 Process       = require("./process").Process
@@ -22,6 +23,6 @@ class exports.Worker extends Mixin(Process, WorkerSetup, WorkerEmitter)
   setupConfig: () ->
     @masterPid = Optimist.argv?["cluster-master-pid"]
 
-    for key, val of Optimist.argv
-      return if !/^cluster-/.test(key) || key == "_" || key == "$0"
+    _.each Optimist.argv, (val, key) =>
+      return if /^cluster-/.test(key) || key == "_" || key == "$0"
       @config[key] = val

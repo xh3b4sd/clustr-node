@@ -2,6 +2,7 @@ _       = require("underscore")
 Jasmine = require("jasmine-node")
 Mock    = require("./lib/mock")
 Clustr  = require("../index")
+Optimist = require("optimist")
 
 describe "api", () =>
   [ worker, properties ] = []
@@ -31,6 +32,8 @@ describe "api", () =>
 
   describe "worker", () =>
     beforeEach () =>
+      Optimist.argv.port = 3000
+
       worker = Clustr.Worker.create
         group:        "worker"
         publisher:    Mock.publisher()
@@ -51,3 +54,9 @@ describe "api", () =>
         "masterPid"
       ]
 
+
+
+    it "should provide propagated command line arguments", ->
+      expect(worker.config.port).toEqual 3000
+      expect(worker.config["_"]).toBeUndefined()
+      expect(worker.config["$0"]).toBeUndefined()
