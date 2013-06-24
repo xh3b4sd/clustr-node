@@ -201,7 +201,7 @@ required:
 - `file` defines the file a worker should execute.
 
 optional:
-- `cpu` set cpu affinity using the `taskset` command, which only works under unix systems.
+- `cpu` set cpu affinity using the `taskset` command, which **only works under unix systems**.
 - `command` defines the command that executes `file`. By default `file` will be executed using the parents execution command.
 - `respawn` by default is set to `true`. To prevent respawning a worker set `respawn` to `false`.
 - `args` an object of command line args that will be given to a process.

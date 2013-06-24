@@ -13,6 +13,9 @@ Clustr = require("../index")
 webWorker = Clustr.Worker.create
   group: "webWorker"
 
+# use propagated private options
+console.log webWorker.config.private # "option"
+
 # webWorker confirm to master
 webWorker.emitConfirmation("webWorker")
 

@@ -25,10 +25,10 @@ master.onConfirmation 2, "cacheWorker", (messages) =>
 
 # master spawns worker
 master.spawn [
-  { file: "./web_worker.coffee",   cpu: 0 }
-  { file: "./web_worker.coffee",   cpu: 1, args: { "cluster-option": "foo", private: "option" } }
-  { file: "./cache_worker.coffee", cpu: 2, respawn: false }
-  { file: "./cache_worker.coffee", cpu: 3, respawn: false }
+  { file: "./web_worker.coffee", }
+  { file: "./web_worker.coffee", args: { "cluster-option": "foo", private: "option" } }
+  { file: "./cache_worker.coffee", respawn: false }
+  { file: "./cache_worker.coffee", respawn: false }
   { file: "./bashscript", command: "bash" }
 ]
 
