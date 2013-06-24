@@ -14,5 +14,14 @@ class exports.Worker extends Mixin(Process, WorkerSetup, WorkerEmitter)
     return Worker.missingGroupNameError() if not @config.group?
 
     @setup()
-    @masterPid = Optimist.argv["cluster-master-pid"]
+    @setupConfig()
     @setupEmitRegistration()
+
+
+
+  setupConfig: () ->
+    @masterPid = Optimist.argv?["cluster-master-pid"]
+
+    for key, val of Optimist.argv
+      return if !/^cluster-/.test(key) || key == "_" || key == "$0"
+      @config[key] = val
