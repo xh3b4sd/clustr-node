@@ -348,8 +348,9 @@ whole cluster, add `--cluster-verbose` to the execution command.
 ### examples
 
 For examples take a look into the `examples/` directory and play around.
-```coffeescript
-coffee examples/master.coffee --cluster-verbose
+```bash
+coffee examples/reload/master.coffee --cluster-verbose
+coffee examples/messaging/master.coffee --cluster-verbose
 ```
 
 
