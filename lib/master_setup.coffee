@@ -15,20 +15,19 @@ class exports.MasterSetup
 
 
   setupReload: () ->
+    emitReload = () =>
+      @emitKill @workerPids.pop(), 1 # send 1 to respawn
+
     @on "workerRegistered", (pid) =>
       # emit the next worker to reload in delay
       setTimeout =>
-        @emitReload(@workerPids) if @workerPids.length > 0
+        emitReload(@workerPids) if @workerPids.length > 0
       , @config.reloadDelay
 
     process.on "SIGHUP", () =>
       @workerPids = _.flatten(_.toArray(@clusterInfo))
-      @emitReload()
+      emitReload()
 
-
-
-  emitReload: () ->
-    @emitKill @workerPids.pop(), 1 # send 1 to respawn
 
 
 

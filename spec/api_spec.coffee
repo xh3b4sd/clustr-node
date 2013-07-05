@@ -21,11 +21,13 @@ describe "api", () =>
       expect(properties).toEqual [
         "config"
         "clusterInfo"
+        "workerPids"
         "stats"
         "pid"
         "logger"
         "publisher"
         "subscriber"
+        "_events"
       ]
 
 

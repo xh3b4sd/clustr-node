@@ -158,11 +158,12 @@ describe "cluster", () =>
 
 
     describe "termination", () =>
-      describe "on 'SIGHUB'", () =>
+      describe "on 'SIGHUP'", () =>
         it "should 'exit' master process", () =>
-          [ [ event, onCb ] ] = process.on.argsForCall
+          # first call is for SIGHUP, second call is for SIGTERM
+          [ [], [ event, onCb ] ] = process.on.argsForCall
           onCb()
-          expect(process.exit).toHaveBeenCalledWith(1)
+          expect(process.exit).toHaveBeenCalledWith(15)
 
 
 
@@ -175,7 +176,7 @@ describe "cluster", () =>
             cache: [ "pid3", "pid4" ]
 
           spyOn(worker, "emitKill")
-          [ [], [ event, exitCb ] ] = process.on.argsForCall
+          [ [], [], [ event, exitCb ] ] = process.on.argsForCall
 
           exitCb(1)
 
