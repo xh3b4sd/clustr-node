@@ -76,26 +76,26 @@ class exports.Spawning
 
 
 
-  spawnChildProcess: (command, args, respawn) =>
-    worker = ChildProcess.spawn(command, args)
-    @log("#{@config.group} spawned worker - command: #{command} #{args.join(" ")}")
+  spawnChildProcess: (command, args, respawn = true) =>
+    worker = ChildProcess.spawn command, args
+    @log "#{@config.group} spawned worker - command: #{command} #{args.join(" ")}"
 
     @stats.spawnChildProcess++
 
     # bubble streams
     worker.stdout.on "data", (data) =>
-      @log(data.toString().replace(/\n$/, ""))
+      @log data.toString().replace(/\n$/, "")
 
     worker.stderr.on "data", (data) =>
-      @log(data.toString().replace(/\n$/, ""))
+      @log data.toString().replace(/\n$/, "")
 
     # respawn worker
     worker.on "exit", (code) =>
-      @log("#{@config.group} killed worker - command: #{command} #{args.join(" ")} - code: #{code} ")
+      @log "#{@config.group} killed worker code #{code} - command: #{command} #{args.join(" ")}"
 
       return if code is 0        # worker ends as expected
-      return if respawn is false # worker shouldn`t respawn
+      return if respawn is false # worker shouldn't respawn
 
-      @spawnChildProcess(command, args, respawn)
       @stats.respawnChildProcess++
-      @log("#{@config.group} respawned worker - command: #{command} #{args.join(" ")}")
+      @log "#{@config.group} attempts to respawn worker - command: #{command} #{args.join(" ")}"
+      @spawnChildProcess command, args, respawn

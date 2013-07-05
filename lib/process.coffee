@@ -1,5 +1,6 @@
 Redis        = require("redis")
 Optimist     = require("optimist")
+{ EventEmitter } = require("events")
 
 Mixin        = require("./mixin").Mixin
 Channels     = require("./channels").Channels
@@ -7,7 +8,7 @@ Emitter      = require("./emitter").Emitter
 Listener     = require("./listener").Listener
 Spawning     = require("./spawning").Spawning
 
-class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning)
+class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning, EventEmitter)
   @missingGroupNameError: () =>
     throw new Error("group name is missing")
 
@@ -80,4 +81,6 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning)
 
 
   log: (message) =>
+    # TODO configure command line arguments and use optimist only at initialization
+    # TODO think about that logging stuff, how would it be cool to handle custom logger?
     @logger(message) if Optimist.argv["verbose"] is true or Optimist.argv["cluster-verbose"] is true
