@@ -14,8 +14,10 @@
 - each worker is able to talk with each cluster member
 - each worker is able to kill workers
 - each worker is able to fetch cluster info
+- each worker respawns by default
 - each worker has a stats object containing event statistics of its own process
 - each worker knows the `pid` of the master process
+- cluster can be reloaed
 - cluster dies when master receives `SIGHUP` (exit code 1)
 - cluster dies when master receives signal from [emitKill](https://github.com/zyndiecate/clustr-node#emitkill)
 
@@ -51,7 +53,7 @@ Clustr = require("clustr-node")
 
 Create a master process.
 ```coffeescript
-master = Clustr.Master.create()
+master = Clustr.Master.create(options = {})
 ```
 
 
@@ -61,6 +63,23 @@ Create a worker process.
 worker = Clustr.Worker.create
   group: "worker"
 ```
+
+
+
+### master options
+- reloadDelay
+
+
+
+### worker options
+- group
+
+
+
+### general options
+- logger
+- publisher
+- subscriber
 
 
 
@@ -222,7 +241,8 @@ worker.spawn [
 ### close
 
 It is possible to close a worker using a given `exitCode`, that defaults to 1.
-Closing a worker means the following.
+That means the worker respawns by default. Sending `exitCode` 0 let the worker
+dieing if `respawn` is set to `false`. Closing a worker means the following.
 - The worker will be deregistered from the cluster.
 - All connections will be closed.
 - All listeners will be removed.
@@ -241,6 +261,16 @@ the cluster. So all workers are always able to talk with the master like that.
 ```coffeescript
 worker.emitPrivate(worker.masterPid, "message")
 ```
+
+
+
+### reloading
+
+Reloading the cluster enables zero downtime deployments. One worker after
+another is forced to be killed and reloaded, delayed by `reloadDelay`.
+- do `kill -s SIGTERM masterpid` to kill cluster
+- do `kill -s SIGHUP masterpid` to reload cluster
+- `reloadDelay` delays reloading single workers to enable buffering, defaults to 500ms
 
 
 
