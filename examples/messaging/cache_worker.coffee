@@ -1,4 +1,4 @@
-Clustr = require("../index")
+Clustr = require("../../index")
 
 
 
