@@ -19,7 +19,7 @@ class exports.Master extends Mixin(Process, MasterSetup)
     #   cacheWorker: [ 5186, 5188 ]
     ###
     @clusterInfo  = {}
-    @workerPids   = []
+    @workerPidsToReload   = []
 
     @setup()
     @setupReload()
