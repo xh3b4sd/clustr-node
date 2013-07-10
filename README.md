@@ -17,8 +17,8 @@
 - each worker respawns by default
 - each worker has a stats object containing event statistics of its own process
 - each worker knows the `pid` of the master process
-- cluster can be reloaed
-- cluster dies when master receives `SIGHUP` (exit code 1)
+- cluster reloads when master receives `SIGHUP` (exit code 1)
+- cluster dies when master receives `SIGTERM` (exit code 15)
 - cluster dies when master receives signal from [emitKill](https://github.com/zyndiecate/clustr-node#emitkill)
 
 
