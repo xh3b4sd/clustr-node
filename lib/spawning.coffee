@@ -11,7 +11,8 @@ class exports.Spawning
 
   @setWorkerCommand: (worker) =>
     return worker.command if worker.command?
-    process.argv[0]
+    workerCommand = process.argv[0]
+    if workerCommand == "coffee" then return "node" else return workerCommand
 
 
 
@@ -22,7 +23,11 @@ class exports.Spawning
 
 
   @setExecutionFile: (worker) =>
-    Path.resolve(process.argv[1], "../", worker.file)
+    executionFile    = Path.resolve(process.argv[1], "../", worker.file)
+    coffeeExecutable = Path.resolve(process.argv[1], "../", "./node_modules/coffee-script/bin/coffee")
+    isCoffeeFile     = /\.coffee$/.test executionFile
+
+    if !isCoffeeFile then return executionFile else [ coffeeExecutable, executionFile ]
 
 
 

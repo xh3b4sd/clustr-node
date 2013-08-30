@@ -10,7 +10,7 @@ class exports.Master extends Mixin(Process, MasterSetup)
 
 
   constructor: (@config = {}) ->
-    @config.group =       "master"
+    @config.group       = "master"
     @config.reloadDelay = @config.reloadDelay || 500
 
     ###
