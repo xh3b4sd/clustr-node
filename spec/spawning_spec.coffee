@@ -23,8 +23,8 @@ describe "spawning", () =>
       worker.spawn [
         { file: "./web_worker.js", args: { "cluster-option5": true, "private-option5": "option" } }
         { file: "./web_worker.js", cpu: 1 }
-        { file: "./cache_worker.coffee", command: "coffee", respawn: false }
-        { file: "./cache_worker.coffee", cpu: 2, command: "coffee" }
+        { file: "./cache_worker.coffee", command: "node", respawn: false }
+        { file: "./cache_worker.coffee", cpu: 2, command: "node" }
       ]
 
       [ callOne, callTwo, callThree, callFour, callFive, callSix ] = ChildProcess.spawn.argsForCall
@@ -76,8 +76,9 @@ describe "spawning", () =>
 
     it "should spawn third worker correctly", () =>
       expect(callThree).toEqual [
-        "coffee"
+        "node"
         [
+          Path.resolve(process.argv[1], "../", "./node_modules/coffee-script/bin/coffee")
           Path.resolve(process.argv[1], "../", "./cache_worker.coffee")
           "--cluster-option1=cluster-command-line-option"
           "--cluster-option2"
@@ -93,7 +94,8 @@ describe "spawning", () =>
         [
           "-c"
           2
-          "coffee"
+          "node"
+          Path.resolve(process.argv[1], "../", "./node_modules/coffee-script/bin/coffee")
           Path.resolve(process.argv[1], "../", "./cache_worker.coffee")
           "--cluster-option1=cluster-command-line-option"
           "--cluster-option2"
@@ -202,8 +204,8 @@ describe "spawning", () =>
       worker.spawn [
         { file: "./web_worker.js", args: { "cluster-option5": true, "private-option5": "option" } }
         { file: "./web_worker.js", cpu: 1 }
-        { file: "./cache_worker.coffee", command: "coffee", respawn: false }
-        { file: "./cache_worker.coffee", cpu: 2, command: "coffee" }
+        { file: "./cache_worker.coffee", command: "node", respawn: false }
+        { file: "./cache_worker.coffee", cpu: 2, command: "node" }
       ]
 
       [ callOne, callTwo, callThree, callFour, callFive, callSix ] = ChildProcess.spawn.argsForCall
@@ -250,8 +252,9 @@ describe "spawning", () =>
 
     it "should spawn third worker correctly", () =>
       expect(callThree).toEqual [
-        "coffee"
+        "node"
         [
+          Path.resolve(process.argv[1], "../", "./node_modules/coffee-script/bin/coffee")
           Path.resolve(process.argv[1], "../", "./cache_worker.coffee")
           "--cluster-master-pid=#{process.pid}"
           "--cluster-option1=cluster-command-line-option"
@@ -268,7 +271,8 @@ describe "spawning", () =>
         [
           "-c"
           2
-          "coffee"
+          "node"
+          Path.resolve(process.argv[1], "../", "./node_modules/coffee-script/bin/coffee")
           Path.resolve(process.argv[1], "../", "./cache_worker.coffee")
           "--cluster-master-pid=#{process.pid}"
           "--cluster-option1=cluster-command-line-option"
