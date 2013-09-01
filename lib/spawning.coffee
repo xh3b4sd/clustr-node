@@ -1,5 +1,6 @@
 _            = require("underscore")
 Path         = require("path")
+Util         = require("util")
 Optimist     = require("optimist")
 ChildProcess = require("child_process")
 
@@ -82,25 +83,33 @@ class exports.Spawning
 
 
   spawnChildProcess: (command, args, respawn = true) =>
-    worker = ChildProcess.spawn command, args
-    @log "#{@config.group} spawned worker - command: #{command} #{args.join(" ")}"
+    worker     = ChildProcess.spawn command, args
+    logOptions = { colors: true, showHidden: true, depth: 5 }
+    logData    = { command: command, args: args, respawn: respawn }
+
+    # log master output using formatted logger.
+    @log "info - spawningModule - spawnedWorker - #{Util.inspect logData, logOptions}"
 
     @stats.spawnChildProcess++
 
-    # bubble streams
+    # bubble out streams using normal @console.log.
     worker.stdout.on "data", (data) =>
-      @log data.toString().replace(/\n$/, "")
+      console.log data.toString().replace(/\n$/, "")
 
+    # bubble err streams using normal @console.log.
     worker.stderr.on "data", (data) =>
-      @log data.toString().replace(/\n$/, "")
+      console.log data.toString().replace(/\n$/, "")
 
     # respawn worker
     worker.on "exit", (code) =>
-      @log "#{@config.group} killed worker code #{code} - command: #{command} #{args.join(" ")}"
+      logData.exitCode = code
+      # log master output using formatted logger.
+      @log "info - spawningModule - killedWorker - #{Util.inspect logData, logOptions}"
 
       return if code is 0        # worker ends as expected
       return if respawn is false # worker shouldn't respawn
 
       @stats.respawnChildProcess++
-      @log "#{@config.group} attempts to respawn worker - command: #{command} #{args.join(" ")}"
+      # log master output using formatted logger.
+      @log "info - spawningModule - respawnWorker - #{Util.inspect logData, logOptions}"
       @spawnChildProcess command, args, respawn
