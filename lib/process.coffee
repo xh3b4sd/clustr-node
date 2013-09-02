@@ -1,5 +1,6 @@
-Redis        = require("redis")
-Optimist     = require("optimist")
+Util             = require("util")
+Redis            = require("redis")
+Optimist         = require("optimist")
 { EventEmitter } = require("events")
 
 Mixin        = require("./mixin").Mixin
@@ -34,6 +35,7 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning, Event
     @logger     = @config.logger     or console.log
     @publisher  = @config.publisher  or Redis.createClient()
     @subscriber = @config.subscriber or Redis.createClient()
+    @logOptions = { colors: true, showHidden: true, depth: 5 }
 
     @setupProcessSubscriptions()
     @setupOnKill()
@@ -57,7 +59,7 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning, Event
       @onKillCb () =>
         { meta: { group }, data } = JSON.parse(payload)
 
-        @log("#{group} sent exit code #{data} to #{@config.group}")
+        @log "info - processModule - onKill - #{Util.inspect { sender: group, exitCode: data }, @logOptions}"
         @close(data)
 
 
@@ -77,6 +79,11 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning, Event
         pid:   @pid
         group: @config.group
       data:    data
+
+
+
+  setLogger: (logger) ->
+    @logger = logger
 
 
 
