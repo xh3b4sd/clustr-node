@@ -14,8 +14,14 @@ class exports.Worker extends Mixin(Process, WorkerSetup, WorkerEmitter)
   constructor: (@config = {}) ->
     return Worker.missingGroupNameError() if not @config.group?
 
+    @config.reloadDelay = @config.reloadDelay || 500
+
     @setup()
     @setupConfig()
+
+
+
+  ready: () ->
     @setupEmitRegistration()
 
 

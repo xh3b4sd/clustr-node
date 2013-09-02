@@ -13,10 +13,14 @@ describe "emitter", () =>
     array:  [ "message", "array" ]
 
   beforeEach () =>
+    GLOBAL.setTimeout = (cb) -> cb()
+
     worker = Clustr.Worker.create
       group:        "worker"
       publisher:    Mock.publisher()
       subscriber:   Mock.subscriber()
+
+    worker.ready()
 
 
 

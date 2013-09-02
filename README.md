@@ -11,13 +11,14 @@
 - each worker register to the cluster on process start
 - each worker deregister from the cluster on process end
 - each worker is able to spawn new processes
-- each worker is able to talk with each cluster member
-- each worker is able to kill workers
+- each worker is able to talk with each worker
+- each worker is able to kill each workers
 - each worker is able to fetch cluster info
 - each worker respawns by default
 - each worker has a stats object containing event statistics of its own process
 - each worker knows the `pid` of the master process
 - cluster reloads when master receives `SIGHUP` (exit code 1)
+- when master receives `SIGHUP`, each worker is forced to reload sequantially
 - cluster dies when master receives `SIGTERM` (exit code 15)
 - cluster dies when master receives signal from [emitKill](https://github.com/zyndiecate/clustr-node#emitkill)
 
@@ -67,33 +68,47 @@ worker = Clustr.Worker.create
 
 
 ### master options
-- reloadDelay
+
+- `reloadDelay`, time in ms to wait before the master forces the next worker to reload
+- `logger`, custom logger to log process output
+- `publisher`, redis publisher
+- `subscriber`, redis subscriber
 
 
 
 ### worker options
-- group
+
+- `group`, name of the group the worker is member of
+- `reloadDelay`, time in ms to wait before the master forces the next worker to reload
+- `logger`, custom logger to log process output
+- `publisher`, redis publisher
+- `subscriber`, redis subscriber
 
 
 
-### general options
-- logger
-- publisher
-- subscriber
+### worker registration
+
+to register to the master, a worker needs to be registered. the `ready` method
+needs to be called when the worker process is ready.  on reloads the next
+worker is forced to reload when the `ready` callback is fired and the
+`reloadDelay` ends.
+```coffeescript
+worker.ready()
+```
 
 
 
 ### groups
 
 Workers can be in every possible group you can imagine. There is just one
-special group. The `master` group. Also there may should be only one worker
-in the `master` group.
+special group. The `master` group. Also there may should be only one worker in
+the `master` group.
 
 
 
 ### onPublic
 
-Public messages are send to each living process. To make a worker listen to
+Public messages are send to __each__ living process. To make a worker listen to
 messages from the `public` channel do.
 ```coffeescript
 worker.onPublic (message) =>
@@ -223,7 +238,7 @@ optional:
 - `cpu` set cpu affinity using the `taskset` command, which **only works under unix systems**.
 - `command` defines the command that executes `file`. By default `file` will be executed using the parents execution command.
 - `respawn` by default is set to `true`. To prevent respawning a worker set `respawn` to `false`.
-- `args` an object of command line args that will be given to a process.
+- `args` an object of command line arguments that will be explicitly given to a process. __command line arguments the master receives, WONT BE applied to workers, unless prefixed with `cluster-`__
 
 To make a worker spawn workers, do something like that.
 ```coffeescript

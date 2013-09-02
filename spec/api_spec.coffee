@@ -27,6 +27,7 @@ describe "api", () =>
         "logger"
         "publisher"
         "subscriber"
+        "logOptions"
         "_events"
       ]
 
@@ -53,6 +54,7 @@ describe "api", () =>
         "logger"
         "publisher"
         "subscriber"
+        "logOptions"
         "masterPid"
       ]
 

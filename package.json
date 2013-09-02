@@ -1,6 +1,6 @@
 {
   "name": "clustr-node",
-  "version": "0.15.0",
+  "version": "0.16.0",
   "description": "CoffeeScript cluster module to manage multi process cluster in NodeJs. Clustr is responseable for worker spawning and messaging between all processes.",
   "author": {
     "name": "Tim Schindler"
@@ -22,7 +22,7 @@
     "jasmine-node": "1.9.1"
   },
   "engines": {
-    "node": ">= 0.8.8"
+    "node": "0.10.17"
   },
   "scripts": {
     "test": "node ./node_modules/jasmine-node/bin/jasmine-node --coffee spec/"
