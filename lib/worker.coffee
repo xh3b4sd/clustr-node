@@ -21,7 +21,7 @@ class exports.Worker extends Mixin(Process, WorkerSetup, WorkerEmitter)
 
 
 
-  ready: () ->
+  emitReady: () ->
     @setupEmitRegistration()
 
 

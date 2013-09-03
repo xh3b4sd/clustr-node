@@ -21,7 +21,7 @@ describe "api", () =>
       expect(properties).toEqual [
         "config"
         "clusterInfo"
-        "workerPidsToReload"
+        "workerConfigs"
         "stats"
         "pid"
         "logger"
@@ -29,6 +29,8 @@ describe "api", () =>
         "subscriber"
         "logOptions"
         "_events"
+        "onClusterStarted"
+        "onClusterReloaded"
       ]
 
 

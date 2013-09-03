@@ -1,6 +1,7 @@
-_       = require("underscore")
-Mixin = require("./mixin").Mixin
-Process = require("./process").Process
+_           = require("underscore")
+Util        = require("util")
+Mixin       = require("./mixin").Mixin
+Process     = require("./process").Process
 MasterSetup = require("./master_setup").MasterSetup
 
 class exports.Master extends Mixin(Process, MasterSetup)
@@ -18,13 +19,17 @@ class exports.Master extends Mixin(Process, MasterSetup)
     #   webWorker:   [ 5182, 5184 ]
     #   cacheWorker: [ 5186, 5188 ]
     ###
-    @clusterInfo  = {}
-    @workerPidsToReload   = []
+    @clusterInfo   = {}
+    @workerConfigs = []
 
     @setup()
     @setupReload()
+    @setupOnStarted()
+    @setupOnReloaded()
     @setupTermination()
     @setupOnClusterInfo()
     @setupOnRegistration()
     @setupOnDeregistration()
     @setupMasterSubscriptions()
+
+    @log "info - masterModule - onConstruction - #{Util.inspect { clusterState: "initializing" }, @logOptions}"

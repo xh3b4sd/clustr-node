@@ -16,8 +16,8 @@ describe "cluster", () =>
   describe "master", () =>
     beforeEach () =>
       worker = Clustr.Master.create
-        publisher:    Mock.publisher()
-        subscriber:   Mock.subscriber()
+        publisher:  Mock.publisher()
+        subscriber: Mock.subscriber()
 
 
 
@@ -263,7 +263,7 @@ describe "cluster", () =>
         publisher:    Mock.publisher()
         subscriber:   Mock.subscriber()
 
-      worker.ready()
+      worker.emitReady()
 
 
 

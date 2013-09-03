@@ -59,7 +59,7 @@ class exports.Process extends Mixin(Channels, Emitter, Listener, Spawning, Event
       @onKillCb () =>
         { meta: { group }, data } = JSON.parse(payload)
 
-        @log "info - processModule - onKill - #{Util.inspect { sender: group, exitCode: data }, @logOptions}"
+        #@log "info - processModule - onKill - #{Util.inspect { sender: group, exitCode: data }, @logOptions}"
         @close(data)
 
 

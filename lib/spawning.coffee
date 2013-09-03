@@ -53,8 +53,8 @@ class exports.Spawning
 
 
 
-  spawn: (workers) =>
-    @prepareChildProcess(workers, @spawnChildProcess)
+  spawn: (@workerConfigs) =>
+    @prepareChildProcess(@workerConfigs, @spawnChildProcess)
 
 
 
@@ -87,7 +87,7 @@ class exports.Spawning
     logData = { command: command, args: args, respawn: respawn }
 
     # log master output using formatted logger.
-    @log "info - spawningModule - spawnedWorker - #{Util.inspect logData, @logOptions}"
+    #@log "info - spawningModule - spawnedWorker - #{Util.inspect logData, @logOptions}"
 
     @stats.spawnChildProcess++
 
@@ -103,12 +103,12 @@ class exports.Spawning
     worker.on "exit", (code) =>
       logData.exitCode = code
       # log master output using formatted logger.
-      @log "info - spawningModule - killedWorker - #{Util.inspect logData, @logOptions}"
+      #@log "info - spawningModule - killedWorker - #{Util.inspect logData, @logOptions}"
 
       return if code is 0        # worker ends as expected
       return if respawn is false # worker shouldn't respawn
 
       @stats.respawnChildProcess++
       # log master output using formatted logger.
-      @log "info - spawningModule - respawnWorker - #{Util.inspect logData, @logOptions}"
+      #@log "info - spawningModule - respawnWorker - #{Util.inspect logData, @logOptions}"
       @spawnChildProcess command, args, respawn

@@ -20,7 +20,7 @@ describe "emitter", () =>
       publisher:    Mock.publisher()
       subscriber:   Mock.subscriber()
 
-    worker.ready()
+    worker.emitReady()
 
 
 

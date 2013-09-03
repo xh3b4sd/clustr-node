@@ -76,6 +76,30 @@ worker = Clustr.Worker.create
 
 
 
+### master listener
+
+#### onClusterStarted
+
+that method is called when all workers registered to the master and the cluster
+is successfully started.
+```coffeescript
+master.onClusterStarted () ->
+  # do something when cluster is started.
+```
+
+
+
+#### onClusterReloaded
+
+that method is called when all workers registered to the master and the cluster
+is successfully reloaded.
+```coffeescript
+master.onClusterReloaded () ->
+  # do something when cluster is reloaded.
+```
+
+
+
 ### worker options
 
 - `group`, name of the group the worker is member of
@@ -88,12 +112,12 @@ worker = Clustr.Worker.create
 
 ### worker registration
 
-to register to the master, a worker needs to be registered. the `ready` method
-needs to be called when the worker process is ready.  on reloads the next
-worker is forced to reload when the `ready` callback is fired and the
+to register to the master, a worker needs to be registered. the `emitReady`
+method needs to be called when the worker process is ready.  on reloads the
+next worker is forced to reload when the `emitReady` callback is fired and the
 `reloadDelay` ends.
 ```coffeescript
-worker.ready()
+worker.emitReady()
 ```
 
 
