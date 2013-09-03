@@ -35,6 +35,8 @@ class exports.MasterSetup
       @clusterInfo = {}
       emitReload()
 
+      @log "info - masterModule - onReload - #{Util.inspect { clusterState: "initializing" }, @logOptions}"
+
 
 
   setupOnClusterInfo: () ->
