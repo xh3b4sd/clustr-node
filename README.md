@@ -387,9 +387,15 @@ whole cluster, add `--cluster-verbose` to the execution command.
 ### examples
 
 For examples take a look into the `examples/` directory and play around.
+
+reload examples
 ```bash
-coffee examples/reload/master.coffee --cluster-verbose
-coffee examples/messaging/master.coffee --cluster-verbose
+cd examples/reload/ && npm install && coffee master.coffee --cluster-verbose
+```
+
+messaging examples
+```bash
+cd examples/messaging/ && npm install && coffee master.coffee --cluster-verbose
 ```
 
 
