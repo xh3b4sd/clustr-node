@@ -25,6 +25,8 @@ webWorkerChild.emitClusterInfo (message) =>
   console.log "webWorkerChild received clusterInfo:"
   console.log message
 
+webWorkerChild.emitReady()
+
 setTimeout () =>
   webWorkerChild.emitKill(webWorkerChild.masterPid, 0)
 , 5000

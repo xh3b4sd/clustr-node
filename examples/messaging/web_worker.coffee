@@ -14,7 +14,7 @@ webWorker = Clustr.Worker.create
   group: "webWorker"
 
 # use propagated private options
-console.log webWorker.config.private # "option"
+console.log webWorker.config.group, webWorker.config.private # "option"
 
 # webWorker confirm to master
 webWorker.emitConfirmation("webWorker")
@@ -23,6 +23,8 @@ webWorker.emitConfirmation("webWorker")
 webWorker.onKill (cb) =>
   #console.log("that is webWorker´s last message before termination")
   cb()
+
+webWorker.emitReady()
 
 # webWorker spawns worker
 webWorker.spawn [

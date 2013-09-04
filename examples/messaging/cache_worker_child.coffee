@@ -20,3 +20,5 @@ cacheWorkerChild.onGroup (message) =>
 
 # cacheWorkerChild receives a private message
 cacheWorkerChild.onPrivate (message) =>
+
+cacheWorkerChild.emitReady()

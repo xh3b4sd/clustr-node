@@ -16,6 +16,8 @@ cacheWorker = Clustr.Worker.create
 # cacheWorker confirm to master
 cacheWorker.emitConfirmation("cacheWorker")
 
+cacheWorker.emitReady()
+
 # cacheWorker spawns worker
 cacheWorker.spawn [
   { name: "cacheWorkerChild", file: "./cache_worker_child.coffee" }
