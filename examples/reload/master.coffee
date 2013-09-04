@@ -8,7 +8,9 @@ Clustr = require("../../index")
 
 # create the clusters master process
 master = Clustr.Master.create()
-console.log "to reload all workers of the cluster send SIGHUP to master pid:", master.pid, "\n"
+
+console.log "to reload all workers of the cluster, send SIGHUP to master pid:", master.pid, "\n"
+console.log "just do: kill -s SIGHUP #{master.pid}\n"
 
 
 
